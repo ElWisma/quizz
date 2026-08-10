@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Las 3 Estaciones del Reportero</title>
+<title>Las Preguntas Mágicas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -314,7 +314,7 @@
     </svg>
   </div>
   <h1 id="overlay-title">Las Preguntas Mágicas</h1>
-  <p id="overlay-desc">¿Listo para demostrar tus habilidades periodísticas junto al zorro Foxym?</p>
+  <p id="overlay-desc">¿Listo para demostrar tus habilidades junto al zorro Foxym?</p>
     <div id="leaderboard-container">
     <h3>Top Mejores Reporteros</h3>
     <table class="leaderboard-table">
@@ -620,7 +620,7 @@
       if(currentLevel < gameData.length){
         showOverlay("¡Nivel Completado!", `Desbloqueaste: ${gameData[currentLevel].name}`, "Siguiente Nivel");
       } else {
-        showOverlay("¡Felicidades Reportero!", `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`, "Jugar de nuevo");
+        showOverlay("¡Felicidades!", `Terminaste el entrenamiento con ${score} puntos.`, "Jugar de nuevo");
         setupEndGameUI();
       }
     }
