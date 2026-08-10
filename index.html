@@ -51,13 +51,8 @@
   }
 
   /* ---------- Fondo decorativo ---------- */
-  #sky-decor{
-    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-  }
-  .cloud{
-    position:absolute; opacity:0.9;
-    animation: drift 40s linear infinite;
-  }
+  #sky-decor{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .cloud{ position:absolute; opacity:0.9; animation: drift 40s linear infinite; }
   .cloud svg{ width:90px; }
   .cloud.c1{ top:6%; left:-20%; animation-duration:46s; }
   .cloud.c2{ top:14%; left:-40%; animation-duration:60s; animation-delay:-10s; transform:scale(0.7); }
@@ -69,8 +64,7 @@
 
   #game-view{
     width:100%; max-width:420px; height:100%; max-height:900px;
-    display:flex; flex-direction:column;
-    padding:18px 18px 22px;
+    display:flex; flex-direction:column; padding:18px 18px 22px;
     position:relative; z-index:1;
   }
 
@@ -80,10 +74,8 @@
     font-size:13px; color:var(--ink); font-weight:700; margin-bottom:8px;
   }
   .pill{
-    background:rgba(255,255,255,0.85);
-    border-radius:20px; padding:6px 12px;
-    display:flex; align-items:center; gap:6px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    background:rgba(255,255,255,0.85); border-radius:20px; padding:6px 12px;
+    display:flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.08);
   }
   .pill svg{ width:16px; height:16px; }
   #score{ transition: transform 0.25s ease; display:inline-block; }
@@ -99,54 +91,32 @@
     text-align:center; font-size:19px; font-weight:700; color:var(--primary-dark);
     margin:6px 0 2px; min-height:24px;
   }
-  #level-sub{
-    text-align:center; font-size:12.5px; color:#6b6280; margin-bottom:10px; font-weight:600;
-  }
+  #level-sub{ text-align:center; font-size:12.5px; color:#6b6280; margin-bottom:10px; font-weight:600; }
 
-  /* ---------- Pista de carrera (temporizador) ---------- */
+  /* ---------- Pista de carrera ---------- */
   #race-wrap{
     background:linear-gradient(180deg, var(--grass-2), var(--grass-1));
     border-radius:16px; padding:8px 10px 6px; margin-bottom:8px;
     box-shadow: inset 0 -3px 0 rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.08);
     position:relative; overflow:hidden;
   }
-  #race-track{
-    position:relative; height:46px; margin-bottom:2px;
-  }
-  .grass-tuft{ position:absolute; bottom:0; width:6px; height:8px; background:rgba(255,255,255,0.18); border-radius:3px 3px 0 0; }
-  #den{
-    position:absolute; right:-2px; bottom:-2px; width:34px; height:30px;
-  }
+  #race-track{ position:relative; height:46px; margin-bottom:2px; }
+  #den{ position:absolute; right:-2px; bottom:-2px; width:34px; height:30px; }
   #racer-rabbit, #racer-fox{
-    position:absolute; bottom:2px; width:38px; height:34px;
-    transition: left 0.95s linear;
+    position:absolute; bottom:2px; width:38px; height:34px; transition: left 0.95s linear;
     filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
   }
   #racer-rabbit{ z-index:3; }
   #racer-fox{ z-index:2; }
   .run-bounce{ animation: run-bounce 0.32s ease-in-out infinite; }
-  @keyframes run-bounce{
-    0%,100%{ transform: translateY(0) rotate(-2deg); }
-    50%{ transform: translateY(-5px) rotate(2deg); }
-  }
-  .poof{
-    position:absolute; bottom:6px; width:26px; height:26px; opacity:0;
-  }
+  @keyframes run-bounce{ 0%,100%{ transform: translateY(0) rotate(-2deg); } 50%{ transform: translateY(-5px) rotate(2deg); } }
+  .poof{ position:absolute; bottom:6px; width:26px; height:26px; opacity:0; }
   .poof.show{ animation: poof-pop 0.6s ease-out forwards; }
-  @keyframes poof-pop{
-    0%{ opacity:0; transform:scale(0.3); }
-    40%{ opacity:1; transform:scale(1.2); }
-    100%{ opacity:0; transform:scale(1.8); }
-  }
-  #time-label{
-    text-align:center; font-size:11px; color:#fff; font-weight:800;
-    text-shadow:0 1px 2px rgba(0,0,0,0.25); letter-spacing:0.5px;
-  }
+  @keyframes poof-pop{ 0%{ opacity:0; transform:scale(0.3); } 40%{ opacity:1; transform:scale(1.2); } 100%{ opacity:0; transform:scale(1.8); } }
+  #time-label{ text-align:center; font-size:11px; color:#fff; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,0.25); }
 
-  /* ---------- Progreso (huellitas) ---------- */
-  #paw-progress{
-    display:flex; justify-content:center; gap:8px; margin-bottom:10px;
-  }
+  /* ---------- Progreso ---------- */
+  #paw-progress{ display:flex; justify-content:center; gap:8px; margin-bottom:10px; }
   .paw{ width:16px; height:16px; opacity:0.35; transition: all 0.3s ease; }
   .paw.filled{ opacity:1; transform:scale(1.15); }
 
@@ -156,18 +126,12 @@
     background:var(--card); border-radius:22px; padding:20px 16px;
     box-shadow:0 8px 20px rgba(46,33,64,0.12);
   }
-
   #level-icon-wrap{ display:flex; justify-content:center; margin-bottom:8px; }
   #level-icon-wrap svg{ width:46px; height:46px; }
-
-  #question{
-    font-size:19px; font-weight:700; text-align:center; line-height:1.4;
-    margin-bottom:20px; color:var(--ink);
-  }
+  #question{ font-size:19px; font-weight:700; text-align:center; line-height:1.4; margin-bottom:20px; color:var(--ink); }
 
   .btn{
-    background:var(--option);
-    border:2.5px solid var(--option-border);
+    background:var(--option); border:2.5px solid var(--option-border);
     padding:14px 16px; margin:7px 0; border-radius:16px;
     cursor:pointer; text-align:center; font-size:15.5px; font-weight:700;
     color:var(--ink); transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
@@ -175,16 +139,8 @@
   .btn:active{ transform: scale(0.97); }
   .btn.correct{ background:var(--success); border-color:#2ea043; color:white; animation: correct-pop 0.4s ease; }
   .btn.wrong{ background:var(--error); border-color:#e14848; color:white; animation: shake 0.45s ease; }
-  @keyframes correct-pop{
-    0%{ transform:scale(1); } 40%{ transform:scale(1.06); } 100%{ transform:scale(1); }
-  }
-  @keyframes shake{
-    0%,100%{ transform:translateX(0); }
-    20%{ transform:translateX(-6px); }
-    40%{ transform:translateX(6px); }
-    60%{ transform:translateX(-4px); }
-    80%{ transform:translateX(4px); }
-  }
+  @keyframes correct-pop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.06); } 100%{ transform:scale(1); } }
+  @keyframes shake{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-6px); } 40%{ transform:translateX(6px); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(4px); } }
 
   /* ---------- Popup flotante ---------- */
   #popup{
@@ -195,23 +151,12 @@
   }
   #popup svg{ width:52px; height:52px; }
   .show-popup{ animation: float-up 1.15s ease-out forwards; }
-  @keyframes float-up{
-    0%{ opacity:0; transform:translate(-50%,25px) scale(0.7); }
-    18%{ opacity:1; transform:translate(-50%,0) scale(1.15); }
-    30%{ transform:translate(-50%,0) scale(1); }
-    80%{ opacity:1; transform:translate(-50%,-45px) scale(1); }
-    100%{ opacity:0; transform:translate(-50%,-65px) scale(0.9); }
-  }
+  @keyframes float-up{ 0%{ opacity:0; transform:translate(-50%,25px) scale(0.7); } 18%{ opacity:1; transform:translate(-50%,0) scale(1.15); } 30%{ transform:translate(-50%,0) scale(1); } 80%{ opacity:1; transform:translate(-50%,-45px) scale(1); } 100%{ opacity:0; transform:translate(-50%,-65px) scale(0.9); } }
 
   /* ---------- Confeti ---------- */
   #confetti-layer{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:14; }
-  .confetti-piece{
-    position:absolute; top:-10px; border-radius:2px; opacity:0.95;
-    animation: confetti-fall linear forwards;
-  }
-  @keyframes confetti-fall{
-    to{ transform: translateY(115vh) rotate(540deg); opacity:0.2; }
-  }
+  .confetti-piece{ position:absolute; top:-10px; border-radius:2px; opacity:0.95; animation: confetti-fall linear forwards; }
+  @keyframes confetti-fall{ to{ transform: translateY(115vh) rotate(540deg); opacity:0.2; } }
 
   /* ---------- Pantalla de nivel ---------- */
   #level-overlay{
@@ -222,10 +167,7 @@
   }
   #level-overlay.active{ opacity:1; pointer-events:all; }
   #mascot-wrap{ width:120px; height:120px; margin-bottom:6px; animation: mascot-bob 2.4s ease-in-out infinite; }
-  @keyframes mascot-bob{
-    0%,100%{ transform:translateY(0) rotate(-1.5deg); }
-    50%{ transform:translateY(-8px) rotate(1.5deg); }
-  }
+  @keyframes mascot-bob{ 0%,100%{ transform:translateY(0) rotate(-1.5deg); } 50%{ transform:translateY(-8px) rotate(1.5deg); } }
   #overlay-title{ color:var(--primary-dark); text-align:center; margin:0; font-size:23px; }
   #overlay-desc{ color:#4a4260; text-align:center; margin-top:8px; font-size:14.5px; font-weight:600; line-height:1.4; }
   .start-btn{
@@ -234,71 +176,26 @@
     cursor:pointer; box-shadow:0 6px 0 var(--primary-dark); transition: transform 0.1s ease;
   }
   .start-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 var(--primary-dark); }
+  .start-btn:disabled { background: #a694db; box-shadow: 0 6px 0 #8573ba; cursor: not-allowed; }
 
-  /* ---------- Leaderboard (NUEVO) ---------- */
+  /* ---------- Leaderboard ---------- */
   #leaderboard-container {
-    margin-top: 15px;
-    width: 100%;
-    max-width: 320px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    padding: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    display: none; /* Se muestra solo al final */
+    margin-top: 15px; width: 100%; max-width: 320px; background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; 
   }
-
-  #leaderboard-container h3 {
-    margin: 0 0 10px 0;
-    text-align: center;
-    color: var(--primary-dark);
-    font-size: 17px;
-  }
-
-  .leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14.5px;
-  }
-
-  .leaderboard-table th, .leaderboard-table td {
-    padding: 8px 6px;
-    text-align: left;
-    border-bottom: 1px solid #eef;
-    color: var(--ink);
-  }
-
-  .leaderboard-table th {
-    font-weight: 700;
-    color: #6b6280;
-  }
-
+  #leaderboard-container h3 { margin: 0 0 10px 0; text-align: center; color: var(--primary-dark); font-size: 17px; }
+  .leaderboard-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .leaderboard-table th, .leaderboard-table td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #eef; color: var(--ink); }
+  .leaderboard-table th { font-weight: 700; color: #6b6280; }
   #player-name-input {
-    margin-top: 20px;
-    padding: 12px;
-    border-radius: 20px;
-    border: 3px solid var(--primary);
-    width: 80%;
-    max-width: 280px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    text-align: center;
-    color: var(--ink);
-    display: none;
-    outline: none;
+    margin-top: 20px; padding: 12px; border-radius: 20px; border: 3px solid var(--primary);
+    width: 80%; max-width: 280px; font-family: 'Nunito', sans-serif; font-size: 15px;
+    font-weight: 700; text-align: center; color: var(--ink); display: none; outline: none;
   }
-
-  .save-btn {
-    margin-top: 12px;
-    background: var(--success);
-    box-shadow: 0 6px 0 #2ea043;
-    display: none;
-  }
+  .save-btn { margin-top: 12px; background: var(--success); box-shadow: 0 6px 0 #2ea043; display: none; }
   .save-btn:active { box-shadow: 0 2px 0 #2ea043; }
 
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
-  }
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; } }
 </style>
 </head>
 <body>
@@ -419,7 +316,6 @@
   <h1 id="overlay-title">Las 3 Estaciones del Reportero</h1>
   <p id="overlay-desc">¿Listo para demostrar tus habilidades periodísticas junto al zorro reportero?</p>
   
-  <!-- NUEVO: Elementos del Leaderboard -->
   <input type="text" id="player-name-input" placeholder="Ingresa tu nombre..." maxlength="15">
   <button id="save-score-btn" class="start-btn save-btn" onclick="saveScore()">Guardar Puntuación</button>
   
@@ -430,15 +326,14 @@
         <tr><th>Rango</th><th>Nombre</th><th>Puntos</th></tr>
       </thead>
       <tbody id="leaderboard-body">
-        <!-- Los datos de Firebase cargarán aquí -->
       </tbody>
     </table>
   </div>
 
-  <button id="main-start-btn" class="start-btn" onclick="startLevel()">¡Comenzar!</button>
+  <button id="main-start-btn" class="start-btn" onclick="startLevel()" disabled>Conectando...</button>
 </div>
 
-<!-- NUEVO: SDKs de Firebase -->
+<!-- SDKs de Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -452,18 +347,19 @@
   messagingSenderId: "648203197422",
   appId: "1:648203197422:web:f9d022df1f26574103ccff"
   };
-  // Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  const gameData = [
+  // --- VARIABLES GLOBALES DEL JUEGO ---
+  // Hacemos gameData dinámico con let. Si falla Firebase, usamos este array como respaldo.
+  let gameData = [
     {
       name: "Nivel 1: El Detector de Noticias",
       desc: "Identifica las partes clave de un artículo.",
       icon: "newspaper",
       questions: [
-        { q: "¿Cuál es la pregunta de la entrevista que busca saber la fecha de un evento?", a: ["¿Dónde fue?", "¿Quién asistió?", "¿Cuándo sucedió?"], correct: 2 },
-        { q: "Texto breve que va debajo de una fotografía en el periódico para explicar la imagen:", a: ["Título", "Pie de foto", "Moraleja"], correct: 1 }
+        { q: "¿Cuál es la pregunta de la entrevista que busca saber la fecha de un evento?", a: ["¿Dónde fue?", "¿Quién asistió?", "¿Cuándo sucedió?"], correct: 2, points: 100 },
+        { q: "Texto breve que va debajo de una fotografía en el periódico para explicar la imagen:", a: ["Título", "Pie de foto", "Moraleja"], correct: 1, points: 100 }
       ]
     },
     {
@@ -471,16 +367,8 @@
       desc: "Demuestra tu dominio de la puntuación y redacción.",
       icon: "pencil",
       questions: [
-        { q: "¿Cuál oración está escrita correctamente para hacer una pregunta al director?", a: ["¿A qué hora empieza el torneo de fútbol en la escuela?", "A qué hora empieza el torneo de fútbol en la escuela?", "¡A qué hora empieza el torneo de fútbol en la escuela!"], correct: 0 },
-        { q: "Uso de signos: ¿Qué signos se usan para expresar sorpresa o emoción en una nota informativa?", a: ["Signos de interrogación (¿?)", "Signos de admiración (¡!)"], correct: 1 }
-      ]
-    },
-    {
-      name: "Nivel 3: Ética y Entrevistas",
-      desc: "Demuestra cómo convivir y tratar a tu comunidad.",
-      icon: "handshake",
-      questions: [
-        { q: "Antes de iniciar una entrevista a un maestro o compañero, lo primero que debes hacer es:", a: ["Empezar a escribir sin hablar.", "Saludar con respeto y explicar de qué trata tu proyecto.", "Tomarle una foto de sorpresa."], correct: 1 }
+        { q: "¿Cuál oración está escrita correctamente para hacer una pregunta al director?", a: ["¿A qué hora empieza el torneo de fútbol en la escuela?", "A qué hora empieza el torneo de fútbol en la escuela?", "¡A qué hora empieza el torneo de fútbol en la escuela!"], correct: 0, points: 100 },
+        { q: "Uso de signos: ¿Qué signos se usan para expresar sorpresa o emoción en una nota informativa?", a: ["Signos de interrogación (¿?)", "Signos de admiración (¡!)"], correct: 1, points: 100 }
       ]
     }
   ];
@@ -494,11 +382,28 @@
   let currentLevel = 0, currentQuestion = 0, score = 0, timeLeft = 10, timerInterval = null;
   let muted = false, audioCtx = null, questionLocked = false;
 
+  /* ---------------- DESCARGAR PREGUNTAS AL INICIAR ---------------- */
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('time-num').innerText = 10;
+    const startBtn = document.getElementById('main-start-btn');
+    
+    try {
+      const doc = await db.collection("config").doc("gameData").get();
+      if (doc.exists && doc.data().levels && doc.data().levels.length > 0) {
+        gameData = doc.data().levels; // Sobrescribir con las preguntas de la base de datos
+      }
+      startBtn.innerText = "¡Comenzar!";
+      startBtn.disabled = false;
+    } catch(err) {
+      console.error("Error al cargar datos de Firebase, usando preguntas locales:", err);
+      startBtn.innerText = "¡Comenzar! (Modo Offline)";
+      startBtn.disabled = false;
+    }
+  });
+
   /* ---------------- Sonido ---------------- */
   function ensureAudio(){
-    if(!audioCtx){
-      try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
-    }
+    if(!audioCtx){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; } }
     if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
   }
   function tone(freq, start, dur, type='sine', peakGain=0.18){
@@ -520,8 +425,7 @@
   function playClickSound(){ tone(700,0,0.06,'sine',0.08); }
 
   function toggleMute(){
-    ensureAudio();
-    muted = !muted;
+    ensureAudio(); muted = !muted;
     document.getElementById('wave1').style.opacity = muted ? 0.15 : 1;
     document.getElementById('wave2').style.opacity = muted ? 0.15 : 1;
   }
@@ -535,22 +439,15 @@
   }
 
   function startLevel(){
-    ensureAudio();
-    playClickSound();
+    ensureAudio(); playClickSound();
     document.getElementById('level-overlay').classList.remove('active');
     
-    // NUEVO: Resetear y ocultar UI del Leaderboard si estamos empezando un juego nuevo
     document.getElementById('player-name-input').style.display = 'none';
     document.getElementById('save-score-btn').style.display = 'none';
     document.getElementById('leaderboard-container').style.display = 'none';
     document.getElementById('main-start-btn').style.display = 'inline-block';
     
-    // Reiniciar variables si se terminó el juego completo
-    if(currentLevel >= gameData.length) {
-        currentLevel = 0;
-        score = 0;
-    }
-
+    if(currentLevel >= gameData.length) { currentLevel = 0; score = 0; }
     currentQuestion = 0;
     loadQuestion();
   }
@@ -580,21 +477,18 @@
     document.getElementById('level-icon-wrap').innerHTML = icons[levelData.icon] || '';
 
     renderPaws(levelData.questions.length, currentQuestion);
-
     document.getElementById('question').innerText = qData.q;
 
     const opts = document.getElementById('options');
     opts.innerHTML = '';
     qData.a.forEach((txt, i) => {
       const b = document.createElement('div');
-      b.className = 'btn';
-      b.innerText = txt;
+      b.className = 'btn'; b.innerText = txt;
       b.onclick = () => checkAnswer(i, b);
       opts.appendChild(b);
     });
 
-    resetRace();
-    startTimer();
+    resetRace(); startTimer();
   }
 
   /* ---------------- Carrera / temporizador ---------------- */
@@ -609,46 +503,36 @@
 
   function updateRace(t){
     const progress = (10 - t) / 10;
-    const foxLeft = 4 + progress * 66;
-    document.getElementById('racer-fox').style.left = foxLeft + '%';
-    if(t <= 3){
-      document.getElementById('time-label').style.color = '#FFD9D9';
-    }
+    document.getElementById('racer-fox').style.left = (4 + progress * 66) + '%';
+    if(t <= 3) document.getElementById('time-label').style.color = '#FFD9D9';
   }
 
   function startTimer(){
-    timeLeft = 10;
-    clearInterval(timerInterval);
+    timeLeft = 10; clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       timeLeft--;
       document.getElementById('time-num').innerText = Math.max(timeLeft, 0);
       updateRace(timeLeft);
-      if(timeLeft <= 0){
-        clearInterval(timerInterval);
-        handleTimeout();
-      }
+      if(timeLeft <= 0){ clearInterval(timerInterval); handleTimeout(); }
     }, 1000);
   }
 
   /* ---------------- Respuestas ---------------- */
-  function lockButtons(){
-    document.querySelectorAll('.btn').forEach(btn => btn.style.pointerEvents = 'none');
-  }
+  function lockButtons(){ document.querySelectorAll('.btn').forEach(btn => btn.style.pointerEvents = 'none'); }
 
   function checkAnswer(selectedIndex, buttonElement){
     if(questionLocked) return;
-    questionLocked = true;
-    clearInterval(timerInterval);
-    lockButtons();
+    questionLocked = true; clearInterval(timerInterval); lockButtons();
 
-    const correctIndex = gameData[currentLevel].questions[currentQuestion].correct;
+    const qData = gameData[currentLevel].questions[currentQuestion];
+    const correctIndex = qData.correct;
     const allBtns = document.querySelectorAll('.btn');
 
     if(selectedIndex === correctIndex){
       buttonElement.classList.add('correct');
-      score += 100;
-      bumpScore();
-      spawnConfetti();
+      // Sumar los puntos dinámicos (o 100 por defecto)
+      score += (qData.points || 100);
+      bumpScore(); spawnConfetti();
       showFloatingFeedback(true, "¡ACERTASTE!");
       playCorrectSound();
     } else {
@@ -661,16 +545,13 @@
 
   function handleTimeout(){
     if(questionLocked) return;
-    questionLocked = true;
-    lockButtons();
+    questionLocked = true; lockButtons();
     const correctIndex = gameData[currentLevel].questions[currentQuestion].correct;
-    const allBtns = document.querySelectorAll('.btn');
-    allBtns[correctIndex].classList.add('correct');
+    document.querySelectorAll('.btn')[correctIndex].classList.add('correct');
 
     document.getElementById('racer-fox').style.left = '72%';
     const poof = document.getElementById('poof-svg');
-    poof.style.left = '78%';
-    poof.classList.add('show');
+    poof.style.left = '78%'; poof.classList.add('show');
     document.getElementById('racer-rabbit').style.opacity = 0;
 
     showFloatingFeedback(false, "¡TIEMPO FUERA!");
@@ -679,8 +560,7 @@
 
   function bumpScore(){
     const el = document.getElementById('score');
-    el.innerText = score;
-    el.classList.add('bump');
+    el.innerText = score; el.classList.add('bump');
     setTimeout(() => el.classList.remove('bump'), 260);
   }
 
@@ -692,8 +572,7 @@
       const p = document.createElement('div');
       p.className = 'confetti-piece';
       const size = 6 + Math.random()*6;
-      p.style.width = size + 'px';
-      p.style.height = (size*0.4) + 'px';
+      p.style.width = size + 'px'; p.style.height = (size*0.4) + 'px';
       p.style.left = (Math.random()*100) + '%';
       p.style.background = colors[Math.floor(Math.random()*colors.length)];
       p.style.animationDuration = (1.1 + Math.random()*0.9) + 's';
@@ -714,15 +593,8 @@
     const popup = document.getElementById('popup');
     let icon = isCorrect ? popupIcons.correct : (text.includes('TIEMPO') ? popupIcons.timeout : popupIcons.wrong);
     popup.innerHTML = icon + `<span style="color:${isCorrect ? '#2ea043' : '#e8672b'}">${text}</span>`;
-
-    popup.classList.remove('show-popup');
-    void popup.offsetWidth;
-    popup.classList.add('show-popup');
-
-    setTimeout(() => {
-      popup.classList.remove('show-popup');
-      nextQuestion();
-    }, 1250);
+    popup.classList.remove('show-popup'); void popup.offsetWidth; popup.classList.add('show-popup');
+    setTimeout(() => { popup.classList.remove('show-popup'); nextQuestion(); }, 1250);
   }
 
   /* ---------------- Progresión ---------------- */
@@ -734,21 +606,11 @@
       loadQuestion();
     } else {
       clearInterval(timerInterval);
-      currentLevel++;
-      playLevelUpSound();
+      currentLevel++; playLevelUpSound();
       if(currentLevel < gameData.length){
-        showOverlay(
-          "¡Nivel Completado!",
-          `Desbloqueaste: ${gameData[currentLevel].name}`,
-          "Siguiente Nivel"
-        );
+        showOverlay("¡Nivel Completado!", `Desbloqueaste: ${gameData[currentLevel].name}`, "Siguiente Nivel");
       } else {
-        showOverlay(
-          "¡Felicidades Reportero!",
-          `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`,
-          "Jugar de nuevo"
-        );
-        // NUEVO: Mostrar UI de Leaderboard al finalizar
+        showOverlay("¡Felicidades Reportero!", `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`, "Jugar de nuevo");
         setupEndGameUI();
       }
     }
@@ -759,28 +621,21 @@
     document.getElementById('main-start-btn').style.display = 'none';
     document.getElementById('player-name-input').style.display = 'block';
     document.getElementById('save-score-btn').style.display = 'inline-block';
-    loadLeaderboard(); // Cargar tabla existente (si hay datos)
+    loadLeaderboard();
   }
 
   function saveScore() {
     const nameInput = document.getElementById('player-name-input').value.trim();
-    if (!nameInput) {
-      alert("Por favor, ingresa un nombre válido.");
-      return;
-    }
-
-    // Ocultar input para evitar múltiples envíos
+    if (!nameInput) return alert("Por favor, ingresa un nombre válido.");
+    
     document.getElementById('player-name-input').style.display = 'none';
     document.getElementById('save-score-btn').style.display = 'none';
 
-    // Guardar en Firestore
     db.collection("leaderboard").add({
-      name: nameInput,
-      score: score,
-      date: firebase.firestore.FieldValue.serverTimestamp()
+      name: nameInput, score: score, date: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      loadLeaderboard(); // Refrescar la tabla
-      document.getElementById('main-start-btn').style.display = 'inline-block'; // Mostrar botón de jugar de nuevo
+      loadLeaderboard();
+      document.getElementById('main-start-btn').style.display = 'inline-block';
     }).catch((error) => {
       console.error("Error al guardar puntuación: ", error);
       alert("Hubo un error al guardar tu puntuación.");
@@ -794,38 +649,19 @@
     container.style.display = 'block';
     tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando datos...</td></tr>';
 
-    db.collection("leaderboard")
-      .orderBy("score", "desc")
-      .limit(5) // Mostrar los mejores 5
-      .get()
-      .then((querySnapshot) => {
-        tbody.innerHTML = '';
-        let rank = 1;
+    db.collection("leaderboard").orderBy("score", "desc").limit(5).get().then((querySnapshot) => {
+        tbody.innerHTML = ''; let rank = 1;
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          tbody.innerHTML += `
-            <tr>
-              <td>#${rank}</td>
-              <td>${data.name}</td>
-              <td><b>${data.score}</b></td>
-            </tr>
-          `;
+          tbody.innerHTML += `<tr><td>#${rank}</td><td>${data.name}</td><td><b>${data.score}</b></td></tr>`;
           rank++;
         });
-        
-        // Si no hay jugadores aún
-        if(querySnapshot.empty){
-          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aún no hay puntuaciones. ¡Sé el primero!</td></tr>';
-        }
+        if(querySnapshot.empty) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aún no hay puntuaciones. ¡Sé el primero!</td></tr>';
       }).catch((error) => {
         console.error("Error al cargar la tabla: ", error);
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Error al cargar la tabla.</td></tr>';
       });
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('time-num').innerText = 10;
-  });
 </script>
 </body>
 </html>
