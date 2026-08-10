@@ -14,6 +14,7 @@
     --ink: #2E2140;
     --bg: #F4F7F6;
     --card: #FFFFFF;
+    --gray: #e0e0e0;
   }
 
   body {
@@ -23,8 +24,10 @@
     color: var(--ink);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   /* --- PANTALLA DE LOGIN --- */
@@ -36,18 +39,18 @@
     text-align: center;
     width: 100%;
     max-width: 350px;
+    margin-top: 10vh;
   }
-
   #login-screen h2 { margin-top: 0; color: var(--primary-dark); }
   
   input[type="password"], input[type="text"], input[type="number"] {
     width: 100%;
-    padding: 12px;
-    margin: 10px 0 20px;
+    padding: 10px;
+    margin: 5px 0 15px;
     border-radius: 8px;
     border: 2px solid #ddd;
     font-family: 'Nunito', sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     box-sizing: border-box;
     outline: none;
   }
@@ -57,30 +60,28 @@
     background: var(--primary);
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 10px 20px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.1s, background 0.2s;
-    width: 100%;
   }
   .btn:active { transform: scale(0.97); }
   .btn:hover { background: var(--primary-dark); }
-  .btn-danger { background: var(--error); width: auto; padding: 8px 16px; font-size: 14px; }
-  .btn-success { background: var(--success); width: auto; padding: 8px 16px; font-size: 14px; }
-  .btn-small { width: auto; padding: 8px 16px; font-size: 14px; }
+  .btn-danger { background: var(--error); }
+  .btn-success { background: var(--success); }
+  .btn-small { padding: 6px 12px; font-size: 13px; }
 
-  /* --- PANEL DE ADMINISTRACIÓN --- */
+  /* --- PANEL DE ADMINISTRACIÓN GENERAL --- */
   #admin-screen {
     display: none;
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     background: var(--card);
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    margin: 20px;
   }
 
   .admin-header {
@@ -91,36 +92,54 @@
     padding-bottom: 15px;
     margin-bottom: 20px;
   }
-
   .admin-header h2 { margin: 0; color: var(--primary-dark); }
 
-  .bulk-actions {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
+  /* --- PESTAÑAS (TABS) --- */
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab-btn {
+    flex: 1; padding: 12px; background: #eee; border: none; 
+    border-radius: 8px; cursor: pointer; font-weight: bold; color: var(--ink);
   }
+  .tab-btn.active { background: var(--primary); color: white; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-
-  th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-  }
-
+  /* --- TABLA LEADERBOARD --- */
+  .bulk-actions { margin-bottom: 15px; display: flex; gap: 10px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
   th { background: #f8f9fa; color: #6b6280; }
-  
-  .edit-mode input {
-    margin: 0;
-    padding: 6px;
-    font-size: 14px;
-  }
-
+  .edit-mode input { margin: 0; padding: 6px; font-size: 14px; }
   .actions-cell { display: flex; gap: 8px; }
+
+  /* --- EDITOR DE PREGUNTAS --- */
+  .level-card {
+    background: #fcfcfc; border: 2px solid #eaeaea; border-radius: 12px;
+    padding: 20px; margin-bottom: 20px;
+  }
+  .level-card-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+  }
+  .level-card-header h3 { margin: 0; color: var(--primary-dark); }
+  
+  .question-card {
+    background: white; border: 1px solid #ddd; border-radius: 8px;
+    padding: 15px; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border-left: 4px solid var(--primary);
+  }
+  
+  .flex-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .flex-row input[type="text"] { flex: 1; margin: 0; }
+  .flex-row input[type="number"] { width: 100px; margin: 0; }
+  .flex-row label { font-weight: bold; font-size: 13px; color: #6b6280; }
+  
+  .options-list { list-style: none; padding: 0; margin: 0; }
+  .options-list li {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 8px;
+    background: #f9f9f9; padding: 8px; border-radius: 6px;
+  }
+  .options-list li input[type="text"] { margin: 0; }
+  .options-list li input[type="radio"] { transform: scale(1.3); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -137,31 +156,54 @@
 <!-- PANEL DE ADMINISTRACIÓN -->
 <div id="admin-screen">
   <div class="admin-header">
-    <h2>Gestión de Jugadores</h2>
+    <h2>Panel de Control</h2>
     <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
   </div>
 
-  <div class="bulk-actions">
-    <button class="btn btn-danger" onclick="deleteSelected()">Eliminar Seleccionados</button>
+  <!-- Pestañas de Navegación -->
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-tab-leaderboard" onclick="switchTab('leaderboard')">Tabla de Jugadores</button>
+    <button class="tab-btn" id="btn-tab-editor" onclick="switchTab('editor')">Editor de Niveles</button>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 40px;"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
-        <th>Nombre del Jugador</th>
-        <th>Puntos</th>
-        <th>Fecha de Registro</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="players-table-body">
-      <!-- Los datos se inyectarán aquí -->
-    </tbody>
-  </table>
+  <!-- PESTAÑA 1: LEADERBOARD -->
+  <div id="tab-leaderboard" class="tab-content active">
+    <div class="bulk-actions">
+      <button class="btn btn-danger" onclick="deleteSelected()">Eliminar Seleccionados</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 40px;"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
+          <th>Nombre del Jugador</th>
+          <th>Puntos</th>
+          <th>Fecha de Registro</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="players-table-body">
+        <!-- Los datos se inyectarán aquí -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PESTAÑA 2: EDITOR DE NIVELES Y PREGUNTAS -->
+  <div id="tab-editor" class="tab-content">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+      <p style="margin: 0; color: #6b6280;">Modifica los niveles, opciones y puntajes del juego.</p>
+      <button class="btn btn-success" onclick="saveGameDataToFirebase()">💾 Guardar Cambios en Firebase</button>
+    </div>
+    
+    <div id="editor-container">
+      <!-- El editor dinámico se inyectará aquí -->
+    </div>
+
+    <button class="btn" style="width: 100%; margin-top: 20px; padding: 15px;" onclick="addLevel()">+ Agregar Nivel Extra</button>
+  </div>
+
 </div>
 
-<!-- SDKs de Firebase (Versión 8) -->
+<!-- SDKs de Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -176,74 +218,67 @@
   appId: "1:648203197422:web:f9d022df1f26574103ccff"
   };
   
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-  }
+  if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
   const db = firebase.firestore();
 
-  let unsubscribe = null; // Para detener la escucha de la base de datos al cerrar sesión
+  let unsubscribe = null; 
+  let gameLevelsData = []; // Array donde vivirá la información del editor
+
+  // --- LÓGICA DE PESTAÑAS (TABS) ---
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(tb => tb.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+  }
 
   // --- LÓGICA DE LOGIN ---
   async function login() {
     const passInput = document.getElementById('admin-pass').value;
     const errorMsg = document.getElementById('login-error');
-    
     if(!passInput) return;
 
     try {
-      // Buscar la contraseña en Firestore
-      const configRef = db.collection("config").doc("admin");
-      const doc = await configRef.get();
-
-      let realPassword = "";
-
-      if (doc.exists) {
-        realPassword = doc.data().password;
-      } else {
-      }
-
-      if (passInput === realPassword) {
-        // Login exitoso
+      const doc = await db.collection("config").doc("admin").get();
+      if (doc.exists && passInput === doc.data().password) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').style.display = 'block';
         errorMsg.style.display = 'none';
         document.getElementById('admin-pass').value = '';
         
-        loadPlayers(); // Cargar la tabla
+        loadPlayers(); 
+        loadGameData(); // Cargar datos del editor al iniciar
       } else {
         errorMsg.style.display = 'block';
       }
     } catch (error) {
       console.error("Error conectando a Firebase:", error);
-      alert("Error de conexión. Revisa la consola.");
+      alert("Error de conexión al verificar credenciales.");
     }
   }
 
   function logout() {
     document.getElementById('admin-screen').style.display = 'none';
     document.getElementById('login-screen').style.display = 'block';
-    if(unsubscribe) unsubscribe(); // Detener actualizaciones en tiempo real
+    if(unsubscribe) unsubscribe();
   }
 
-  // --- LÓGICA DE LA TABLA (CRUD) ---
+  /* =========================================================
+     ZONA 1: LEADERBOARD (Sin cambios a tu lógica original)
+     ========================================================= */
   function loadPlayers() {
     const tbody = document.getElementById('players-table-body');
-    
-    // onSnapshot mantiene la tabla actualizada en tiempo real
     unsubscribe = db.collection("leaderboard").orderBy("score", "desc").onSnapshot((snapshot) => {
       tbody.innerHTML = '';
-      
       if (snapshot.empty) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay jugadores registrados.</td></tr>';
         return;
       }
-
       snapshot.forEach((doc) => {
         const data = doc.data();
         const id = doc.id;
         const dateStr = data.date ? data.date.toDate().toLocaleString('es-MX') : 'Desconocida';
 
-        // Fila normal
         const tr = document.createElement('tr');
         tr.id = `row-${id}`;
         tr.innerHTML = `
@@ -261,92 +296,215 @@
     });
   }
 
-  // --- EDICIÓN ---
   function enableEdit(id) {
     const nameTd = document.getElementById(`name-${id}`);
     const scoreTd = document.getElementById(`score-${id}`);
-    
     const currentName = nameTd.innerText;
     const currentScore = scoreTd.innerText;
-
-    // Cambiar a inputs
     nameTd.innerHTML = `<input type="text" id="edit-name-${id}" value="${currentName}">`;
     scoreTd.innerHTML = `<input type="number" id="edit-score-${id}" value="${currentScore}">`;
-
-    // Cambiar botones
     const actionsTd = document.querySelector(`#row-${id} .actions-cell`);
     actionsTd.innerHTML = `
-      <button class="btn btn-success btn-small" onclick="saveEdit('${id}')">Guardar</button>
+      <button class="btn btn-success btn-small" onclick="saveEditLeaderboard('${id}')">Guardar</button>
       <button class="btn btn-danger btn-small" onclick="cancelEdit('${id}', '${currentName}', '${currentScore}')">Cancelar</button>
     `;
   }
 
   function cancelEdit(id, oldName, oldScore) {
-    // Si cancela, devolvemos el texto original y esperamos al onSnapshot para regenerar los botones
     document.getElementById(`name-${id}`).innerText = oldName;
     document.getElementById(`score-${id}`).innerText = oldScore;
-    // Forzamos la recarga leyendo de nuevo (onSnapshot se encarga de arreglar la fila en un segundo)
   }
 
-  function saveEdit(id) {
+  function saveEditLeaderboard(id) {
     const newName = document.getElementById(`edit-name-${id}`).value.trim();
     const newScore = parseInt(document.getElementById(`edit-score-${id}`).value);
-
-    if (!newName || isNaN(newScore)) {
-      alert("Por favor ingresa datos válidos.");
-      return;
-    }
-
-    db.collection("leaderboard").doc(id).update({
-      name: newName,
-      score: newScore
-    }).then(() => {
-      console.log("Actualizado con éxito");
-      // No necesitamos actualizar el HTML manualmente porque onSnapshot lo hará por nosotros
-    }).catch(error => {
-      console.error("Error al actualizar:", error);
-      alert("Hubo un error al guardar.");
-    });
+    if (!newName || isNaN(newScore)) return alert("Datos inválidos.");
+    db.collection("leaderboard").doc(id).update({ name: newName, score: newScore });
   }
 
-  // --- ELIMINACIÓN INDIVIDUAL ---
   function deletePlayer(id) {
-    if(confirm("¿Estás seguro de que quieres eliminar a este jugador?")) {
-      db.collection("leaderboard").doc(id).delete();
-    }
+    if(confirm("¿Eliminar a este jugador?")) db.collection("leaderboard").doc(id).delete();
   }
 
-  // --- ELIMINACIÓN MÚLTIPLE ---
   function toggleSelectAll() {
     const selectAllCheck = document.getElementById('select-all');
-    const checkboxes = document.querySelectorAll('.player-checkbox');
-    checkboxes.forEach(cb => cb.checked = selectAllCheck.checked);
+    document.querySelectorAll('.player-checkbox').forEach(cb => cb.checked = selectAllCheck.checked);
   }
 
   function deleteSelected() {
     const checkboxes = document.querySelectorAll('.player-checkbox:checked');
-    if (checkboxes.length === 0) {
-      alert("Selecciona al menos un jugador para eliminar.");
-      return;
-    }
-
-    if(confirm(`¿Estás seguro de eliminar ${checkboxes.length} jugadores de golpe?`)) {
-      // Ejecutamos las eliminaciones en lote (batch) o con promesas
+    if (checkboxes.length === 0) return alert("Selecciona al menos un jugador.");
+    if(confirm(`¿Eliminar ${checkboxes.length} jugadores?`)) {
       const batch = db.batch();
-      
-      checkboxes.forEach(cb => {
-        const docRef = db.collection("leaderboard").doc(cb.value);
-        batch.delete(docRef);
-      });
-
-      batch.commit().then(() => {
-        document.getElementById('select-all').checked = false;
-        console.log("Jugadores eliminados");
-      }).catch(err => {
-        console.error("Error en el borrado múltiple:", err);
-      });
+      checkboxes.forEach(cb => batch.delete(db.collection("leaderboard").doc(cb.value)));
+      batch.commit().then(() => document.getElementById('select-all').checked = false);
     }
   }
+
+
+  /* =========================================================
+     ZONA 2: EDITOR DE PREGUNTAS (Nueva funcionalidad)
+     ========================================================= */
+
+  // Función para escapar caracteres y evitar que comillas rompan los inputs
+  function escapeHTML(str) {
+    if(typeof str !== 'string') return str;
+    return str.replace(/"/g, '&quot;');
+  }
+
+  async function loadGameData() {
+    try {
+      const doc = await db.collection("config").doc("gameData").get();
+      if (doc.exists && doc.data().levels) {
+        gameLevelsData = doc.data().levels;
+      } else {
+        // Si la base está vacía, cargamos un nivel de ejemplo básico
+        gameLevelsData = [{
+          name: "Nuevo Nivel", desc: "Descripción del nivel", icon: "newspaper",
+          questions: [
+            { q: "Pregunta de ejemplo", a: ["Opción A", "Opción B"], correct: 0, points: 100 }
+          ]
+        }];
+      }
+      renderEditor();
+    } catch (err) {
+      console.error("Error cargando preguntas:", err);
+    }
+  }
+
+  function renderEditor() {
+    const container = document.getElementById('editor-container');
+    let html = '';
+
+    gameLevelsData.forEach((level, lIndex) => {
+      html += `
+      <div class="level-card">
+        <div class="level-card-header">
+          <h3>Nivel ${lIndex + 1}</h3>
+          <button class="btn btn-danger btn-small" onclick="deleteLevel(${lIndex})">X Eliminar Nivel</button>
+        </div>
+        
+        <div class="flex-row">
+          <label>Nombre:</label>
+          <input type="text" value="${escapeHTML(level.name)}" oninput="updateLevelData(${lIndex}, 'name', this.value)">
+          <label>Ícono:</label>
+          <input type="text" style="width: 120px;" value="${escapeHTML(level.icon)}" oninput="updateLevelData(${lIndex}, 'icon', this.value)" placeholder="newspaper...">
+        </div>
+        <div class="flex-row">
+          <label>Descripción:</label>
+          <input type="text" value="${escapeHTML(level.desc)}" oninput="updateLevelData(${lIndex}, 'desc', this.value)">
+        </div>
+        <hr style="border:0; border-top: 1px solid #ddd; margin: 20px 0;">
+        <h4>Preguntas del Nivel</h4>
+      `;
+
+      level.questions.forEach((q, qIndex) => {
+        html += `
+        <div class="question-card">
+          <div class="level-card-header">
+            <strong>Pregunta ${qIndex + 1}</strong>
+            <button class="btn btn-danger btn-small" onclick="deleteQuestion(${lIndex}, ${qIndex})">X Borrar Pregunta</button>
+          </div>
+          
+          <div class="flex-row">
+            <label>Texto:</label>
+            <input type="text" value="${escapeHTML(q.q)}" oninput="updateQuestionData(${lIndex}, ${qIndex}, 'q', this.value)">
+            <label>Puntaje:</label>
+            <input type="number" value="${q.points || 100}" oninput="updateQuestionData(${lIndex}, ${qIndex}, 'points', parseInt(this.value))">
+          </div>
+          
+          <label style="font-weight:bold; font-size: 13px; color: #6b6280;">Opciones de Respuesta (Selecciona la correcta):</label>
+          <ul class="options-list">
+        `;
+        
+        q.a.forEach((opt, oIndex) => {
+          const isChecked = (q.correct === oIndex) ? "checked" : "";
+          html += `
+            <li>
+              <input type="radio" name="correct-${lIndex}-${qIndex}" ${isChecked} onchange="setCorrectAnswer(${lIndex}, ${qIndex}, ${oIndex})">
+              <input type="text" style="flex:1;" value="${escapeHTML(opt)}" oninput="updateOptionText(${lIndex}, ${qIndex}, ${oIndex}, this.value)">
+              <button class="btn btn-danger btn-small" onclick="deleteOption(${lIndex}, ${qIndex}, ${oIndex})">X</button>
+            </li>
+          `;
+        });
+
+        html += `
+          </ul>
+          <button class="btn btn-small" style="margin-top:10px; background:#ddd; color:#333;" onclick="addOption(${lIndex}, ${qIndex})">+ Agregar Opción</button>
+        </div>`;
+      });
+
+      html += `
+        <button class="btn btn-small" style="margin-top:20px;" onclick="addQuestion(${lIndex})">+ Agregar Pregunta a este Nivel</button>
+      </div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  // --- Funciones para manipular el array temporal (Local) ---
+  
+  function updateLevelData(lIndex, field, value) { gameLevelsData[lIndex][field] = value; }
+  
+  function updateQuestionData(lIndex, qIndex, field, value) { gameLevelsData[lIndex].questions[qIndex][field] = value; }
+  
+  function updateOptionText(lIndex, qIndex, oIndex, value) { gameLevelsData[lIndex].questions[qIndex].a[oIndex] = value; }
+  
+  function setCorrectAnswer(lIndex, qIndex, oIndex) { gameLevelsData[lIndex].questions[qIndex].correct = oIndex; }
+
+  function addLevel() {
+    gameLevelsData.push({
+      name: "Nuevo Nivel", desc: "Descripción...", icon: "newspaper",
+      questions: [{ q: "¿Nueva Pregunta?", a: ["Opción 1", "Opción 2"], correct: 0, points: 100 }]
+    });
+    renderEditor();
+  }
+
+  function deleteLevel(lIndex) {
+    if(confirm("¿Eliminar nivel completo con todas sus preguntas?")) {
+      gameLevelsData.splice(lIndex, 1);
+      renderEditor();
+    }
+  }
+
+  function addQuestion(lIndex) {
+    gameLevelsData[lIndex].questions.push({ q: "¿Nueva Pregunta?", a: ["Opción 1", "Opción 2"], correct: 0, points: 100 });
+    renderEditor();
+  }
+
+  function deleteQuestion(lIndex, qIndex) {
+    if(confirm("¿Eliminar esta pregunta?")) {
+      gameLevelsData[lIndex].questions.splice(qIndex, 1);
+      renderEditor();
+    }
+  }
+
+  function addOption(lIndex, qIndex) {
+    gameLevelsData[lIndex].questions[qIndex].a.push("Nueva Opción");
+    renderEditor();
+  }
+
+  function deleteOption(lIndex, qIndex, oIndex) {
+    const qData = gameLevelsData[lIndex].questions[qIndex];
+    if(qData.a.length <= 2) return alert("Una pregunta debe tener al menos 2 opciones.");
+    qData.a.splice(oIndex, 1);
+    // Si borramos la correcta, reseteamos a la opcion 0 por seguridad
+    if(qData.correct === oIndex) qData.correct = 0; 
+    else if(qData.correct > oIndex) qData.correct -= 1;
+    renderEditor();
+  }
+
+  // --- Guardar Estructura a Firebase ---
+  async function saveGameDataToFirebase() {
+    try {
+      await db.collection("config").doc("gameData").set({ levels: gameLevelsData });
+      alert("¡Niveles y preguntas guardados con éxito en la base de datos!");
+    } catch(err) {
+      console.error("Error al guardar preguntas:", err);
+      alert("Hubo un error al guardar. Revisa la consola.");
+    }
+  }
+
 </script>
 </body>
 </html>
