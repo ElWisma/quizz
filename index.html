@@ -235,6 +235,67 @@
   }
   .start-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 var(--primary-dark); }
 
+  /* ---------- Leaderboard (NUEVO) ---------- */
+  #leaderboard-container {
+    margin-top: 15px;
+    width: 100%;
+    max-width: 320px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: none; /* Se muestra solo al final */
+  }
+
+  #leaderboard-container h3 {
+    margin: 0 0 10px 0;
+    text-align: center;
+    color: var(--primary-dark);
+    font-size: 17px;
+  }
+
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+
+  .leaderboard-table th, .leaderboard-table td {
+    padding: 8px 6px;
+    text-align: left;
+    border-bottom: 1px solid #eef;
+    color: var(--ink);
+  }
+
+  .leaderboard-table th {
+    font-weight: 700;
+    color: #6b6280;
+  }
+
+  #player-name-input {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 20px;
+    border: 3px solid var(--primary);
+    width: 80%;
+    max-width: 280px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--ink);
+    display: none;
+    outline: none;
+  }
+
+  .save-btn {
+    margin-top: 12px;
+    background: var(--success);
+    box-shadow: 0 6px 0 #2ea043;
+    display: none;
+  }
+  .save-btn:active { box-shadow: 0 2px 0 #2ea043; }
+
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
   }
@@ -357,10 +418,44 @@
   </div>
   <h1 id="overlay-title">Las 3 Estaciones del Reportero</h1>
   <p id="overlay-desc">¿Listo para demostrar tus habilidades periodísticas junto al zorro reportero?</p>
-  <button class="start-btn" onclick="startLevel()">¡Comenzar!</button>
+  
+  <!-- NUEVO: Elementos del Leaderboard -->
+  <input type="text" id="player-name-input" placeholder="Ingresa tu nombre..." maxlength="15">
+  <button id="save-score-btn" class="start-btn save-btn" onclick="saveScore()">Guardar Puntuación</button>
+  
+  <div id="leaderboard-container">
+    <h3>Top Mejores Reporteros</h3>
+    <table class="leaderboard-table">
+      <thead>
+        <tr><th>Rango</th><th>Nombre</th><th>Puntos</th></tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <!-- Los datos de Firebase cargarán aquí -->
+      </tbody>
+    </table>
+  </div>
+
+  <button id="main-start-btn" class="start-btn" onclick="startLevel()">¡Comenzar!</button>
 </div>
 
+<!-- NUEVO: SDKs de Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
 <script>
+  // --- Configuración de Firebase ---
+  const firebaseConfig = {
+  apiKey: "AIzaSyDJaoXKhI8QJ0i36hicpGGC21gDRAvMDRg",
+  authDomain: "quizzrepor.firebaseapp.com",
+  projectId: "quizzrepor",
+  storageBucket: "quizzrepor.firebasestorage.app",
+  messagingSenderId: "648203197422",
+  appId: "1:648203197422:web:f9d022df1f26574103ccff"
+  };
+  // Inicializar Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
   const gameData = [
     {
       name: "Nivel 1: El Detector de Noticias",
@@ -435,7 +530,7 @@
   function showOverlay(title, desc, btnText){
     document.getElementById('overlay-title').innerText = title;
     document.getElementById('overlay-desc').innerText = desc;
-    document.querySelector('.start-btn').innerText = btnText;
+    document.getElementById('main-start-btn').innerText = btnText;
     document.getElementById('level-overlay').classList.add('active');
   }
 
@@ -443,6 +538,19 @@
     ensureAudio();
     playClickSound();
     document.getElementById('level-overlay').classList.remove('active');
+    
+    // NUEVO: Resetear y ocultar UI del Leaderboard si estamos empezando un juego nuevo
+    document.getElementById('player-name-input').style.display = 'none';
+    document.getElementById('save-score-btn').style.display = 'none';
+    document.getElementById('leaderboard-container').style.display = 'none';
+    document.getElementById('main-start-btn').style.display = 'inline-block';
+    
+    // Reiniciar variables si se terminó el juego completo
+    if(currentLevel >= gameData.length) {
+        currentLevel = 0;
+        score = 0;
+    }
+
     currentQuestion = 0;
     loadQuestion();
   }
@@ -500,7 +608,6 @@
   }
 
   function updateRace(t){
-    // el zorro avanza de 4% a 70% conforme baja el tiempo; el conejo se aleja un poco al inicio
     const progress = (10 - t) / 10;
     const foxLeft = 4 + progress * 66;
     document.getElementById('racer-fox').style.left = foxLeft + '%';
@@ -560,7 +667,6 @@
     const allBtns = document.querySelectorAll('.btn');
     allBtns[correctIndex].classList.add('correct');
 
-    // el zorro alcanza al conejo, aparece un "poof" juguetón
     document.getElementById('racer-fox').style.left = '72%';
     const poof = document.getElementById('poof-svg');
     poof.style.left = '78%';
@@ -642,13 +748,81 @@
           `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`,
           "Jugar de nuevo"
         );
-        currentLevel = 0;
-        score = 0;
+        // NUEVO: Mostrar UI de Leaderboard al finalizar
+        setupEndGameUI();
       }
     }
   }
 
-  // Estado inicial de los botones de mute (visual)
+  /* ---------------- Logica del Leaderboard ---------------- */
+  function setupEndGameUI() {
+    document.getElementById('main-start-btn').style.display = 'none';
+    document.getElementById('player-name-input').style.display = 'block';
+    document.getElementById('save-score-btn').style.display = 'inline-block';
+    loadLeaderboard(); // Cargar tabla existente (si hay datos)
+  }
+
+  function saveScore() {
+    const nameInput = document.getElementById('player-name-input').value.trim();
+    if (!nameInput) {
+      alert("Por favor, ingresa un nombre válido.");
+      return;
+    }
+
+    // Ocultar input para evitar múltiples envíos
+    document.getElementById('player-name-input').style.display = 'none';
+    document.getElementById('save-score-btn').style.display = 'none';
+
+    // Guardar en Firestore
+    db.collection("leaderboard").add({
+      name: nameInput,
+      score: score,
+      date: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      loadLeaderboard(); // Refrescar la tabla
+      document.getElementById('main-start-btn').style.display = 'inline-block'; // Mostrar botón de jugar de nuevo
+    }).catch((error) => {
+      console.error("Error al guardar puntuación: ", error);
+      alert("Hubo un error al guardar tu puntuación.");
+      document.getElementById('main-start-btn').style.display = 'inline-block';
+    });
+  }
+
+  function loadLeaderboard() {
+    const container = document.getElementById('leaderboard-container');
+    const tbody = document.getElementById('leaderboard-body');
+    container.style.display = 'block';
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando datos...</td></tr>';
+
+    db.collection("leaderboard")
+      .orderBy("score", "desc")
+      .limit(5) // Mostrar los mejores 5
+      .get()
+      .then((querySnapshot) => {
+        tbody.innerHTML = '';
+        let rank = 1;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          tbody.innerHTML += `
+            <tr>
+              <td>#${rank}</td>
+              <td>${data.name}</td>
+              <td><b>${data.score}</b></td>
+            </tr>
+          `;
+          rank++;
+        });
+        
+        // Si no hay jugadores aún
+        if(querySnapshot.empty){
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aún no hay puntuaciones. ¡Sé el primero!</td></tr>';
+        }
+      }).catch((error) => {
+        console.error("Error al cargar la tabla: ", error);
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Error al cargar la tabla.</td></tr>';
+      });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('time-num').innerText = 10;
   });
