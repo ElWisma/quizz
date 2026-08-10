@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Las 3 Estaciones del Reportero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:#7EC8E3;
+    --sky-bottom:#DFF6FF;
+    --sun:#FFD166;
+    --grass-1:#8FCB55;
+    --grass-2:#79b849;
+    --fox:#FF8C42;
+    --fox-dark:#E8672B;
+    --fox-belly:#FFF3E4;
+    --rabbit:#F8F5F0;
+    --rabbit-shadow:#DCD5CC;
+    --ink:#2E2140;
+    --card:#FFFFFF;
+    --option:#F3EFFF;
+    --option-border:#DCD1FF;
+    --primary:#7C5CFF;
+    --primary-dark:#5E3FE0;
+    --success:#3FB950;
+    --error:#FF6B6B;
+    --gold:#FFC93C;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    font-family:'Nunito', sans-serif;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 55%, #EFF9E5 100%);
+    color:var(--ink);
+    -webkit-tap-highlight-color: transparent;
+    user-select:none;
+  }
+
+  h1,h2,h3,#level-title,#question,.start-btn,#overlay-title{
+    font-family:'Baloo 2', sans-serif;
+  }
+
+  /* ---------- Fondo decorativo ---------- */
+  #sky-decor{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .cloud{
+    position:absolute; opacity:0.9;
+    animation: drift 40s linear infinite;
+  }
+  .cloud svg{ width:90px; }
+  .cloud.c1{ top:6%; left:-20%; animation-duration:46s; }
+  .cloud.c2{ top:14%; left:-40%; animation-duration:60s; animation-delay:-10s; transform:scale(0.7); }
+  .cloud.c3{ top:3%; left:-60%; animation-duration:52s; animation-delay:-25s; transform:scale(0.55); }
+  @keyframes drift{ from{ transform:translateX(0);} to{ transform:translateX(160vw);} }
+
+  .sun-wrap{ position:absolute; top:18px; right:18px; width:54px; height:54px; animation:spin 30s linear infinite; }
+  @keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  #game-view{
+    width:100%; max-width:420px; height:100%; max-height:900px;
+    display:flex; flex-direction:column;
+    padding:18px 18px 22px;
+    position:relative; z-index:1;
+  }
+
+  /* ---------- Encabezado ---------- */
+  #top-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; color:var(--ink); font-weight:700; margin-bottom:8px;
+  }
+  .pill{
+    background:rgba(255,255,255,0.85);
+    border-radius:20px; padding:6px 12px;
+    display:flex; align-items:center; gap:6px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  }
+  .pill svg{ width:16px; height:16px; }
+  #score{ transition: transform 0.25s ease; display:inline-block; }
+  #score.bump{ transform: scale(1.35); }
+  #mute-btn{
+    background:rgba(255,255,255,0.85); border:none; border-radius:50%;
+    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  }
+  #mute-btn svg{ width:16px; height:16px; }
+
+  #level-title{
+    text-align:center; font-size:19px; font-weight:700; color:var(--primary-dark);
+    margin:6px 0 2px; min-height:24px;
+  }
+  #level-sub{
+    text-align:center; font-size:12.5px; color:#6b6280; margin-bottom:10px; font-weight:600;
+  }
+
+  /* ---------- Pista de carrera (temporizador) ---------- */
+  #race-wrap{
+    background:linear-gradient(180deg, var(--grass-2), var(--grass-1));
+    border-radius:16px; padding:8px 10px 6px; margin-bottom:8px;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.08);
+    position:relative; overflow:hidden;
+  }
+  #race-track{
+    position:relative; height:46px; margin-bottom:2px;
+  }
+  .grass-tuft{ position:absolute; bottom:0; width:6px; height:8px; background:rgba(255,255,255,0.18); border-radius:3px 3px 0 0; }
+  #den{
+    position:absolute; right:-2px; bottom:-2px; width:34px; height:30px;
+  }
+  #racer-rabbit, #racer-fox{
+    position:absolute; bottom:2px; width:38px; height:34px;
+    transition: left 0.95s linear;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+  }
+  #racer-rabbit{ z-index:3; }
+  #racer-fox{ z-index:2; }
+  .run-bounce{ animation: run-bounce 0.32s ease-in-out infinite; }
+  @keyframes run-bounce{
+    0%,100%{ transform: translateY(0) rotate(-2deg); }
+    50%{ transform: translateY(-5px) rotate(2deg); }
+  }
+  .poof{
+    position:absolute; bottom:6px; width:26px; height:26px; opacity:0;
+  }
+  .poof.show{ animation: poof-pop 0.6s ease-out forwards; }
+  @keyframes poof-pop{
+    0%{ opacity:0; transform:scale(0.3); }
+    40%{ opacity:1; transform:scale(1.2); }
+    100%{ opacity:0; transform:scale(1.8); }
+  }
+  #time-label{
+    text-align:center; font-size:11px; color:#fff; font-weight:800;
+    text-shadow:0 1px 2px rgba(0,0,0,0.25); letter-spacing:0.5px;
+  }
+
+  /* ---------- Progreso (huellitas) ---------- */
+  #paw-progress{
+    display:flex; justify-content:center; gap:8px; margin-bottom:10px;
+  }
+  .paw{ width:16px; height:16px; opacity:0.35; transition: all 0.3s ease; }
+  .paw.filled{ opacity:1; transform:scale(1.15); }
+
+  /* ---------- Pregunta ---------- */
+  #question-container{
+    flex-grow:1; display:flex; flex-direction:column; justify-content:center;
+    background:var(--card); border-radius:22px; padding:20px 16px;
+    box-shadow:0 8px 20px rgba(46,33,64,0.12);
+  }
+
+  #level-icon-wrap{ display:flex; justify-content:center; margin-bottom:8px; }
+  #level-icon-wrap svg{ width:46px; height:46px; }
+
+  #question{
+    font-size:19px; font-weight:700; text-align:center; line-height:1.4;
+    margin-bottom:20px; color:var(--ink);
+  }
+
+  .btn{
+    background:var(--option);
+    border:2.5px solid var(--option-border);
+    padding:14px 16px; margin:7px 0; border-radius:16px;
+    cursor:pointer; text-align:center; font-size:15.5px; font-weight:700;
+    color:var(--ink); transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn.correct{ background:var(--success); border-color:#2ea043; color:white; animation: correct-pop 0.4s ease; }
+  .btn.wrong{ background:var(--error); border-color:#e14848; color:white; animation: shake 0.45s ease; }
+  @keyframes correct-pop{
+    0%{ transform:scale(1); } 40%{ transform:scale(1.06); } 100%{ transform:scale(1); }
+  }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-6px); }
+    40%{ transform:translateX(6px); }
+    60%{ transform:translateX(-4px); }
+    80%{ transform:translateX(4px); }
+  }
+
+  /* ---------- Popup flotante ---------- */
+  #popup{
+    position:absolute; top:44%; left:50%; transform:translate(-50%,-50%);
+    font-size:30px; font-weight:800; opacity:0; pointer-events:none;
+    text-shadow:0 4px 14px rgba(0,0,0,0.25); text-align:center; width:100%; z-index:15;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  #popup svg{ width:52px; height:52px; }
+  .show-popup{ animation: float-up 1.15s ease-out forwards; }
+  @keyframes float-up{
+    0%{ opacity:0; transform:translate(-50%,25px) scale(0.7); }
+    18%{ opacity:1; transform:translate(-50%,0) scale(1.15); }
+    30%{ transform:translate(-50%,0) scale(1); }
+    80%{ opacity:1; transform:translate(-50%,-45px) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-65px) scale(0.9); }
+  }
+
+  /* ---------- Confeti ---------- */
+  #confetti-layer{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:14; }
+  .confetti-piece{
+    position:absolute; top:-10px; border-radius:2px; opacity:0.95;
+    animation: confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall{
+    to{ transform: translateY(115vh) rotate(540deg); opacity:0.2; }
+  }
+
+  /* ---------- Pantalla de nivel ---------- */
+  #level-overlay{
+    position:absolute; inset:0; z-index:20;
+    background:linear-gradient(180deg, rgba(126,200,227,0.97), rgba(223,246,255,0.98));
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    padding:0 26px; opacity:0; pointer-events:none; transition:opacity 0.3s ease;
+  }
+  #level-overlay.active{ opacity:1; pointer-events:all; }
+  #mascot-wrap{ width:120px; height:120px; margin-bottom:6px; animation: mascot-bob 2.4s ease-in-out infinite; }
+  @keyframes mascot-bob{
+    0%,100%{ transform:translateY(0) rotate(-1.5deg); }
+    50%{ transform:translateY(-8px) rotate(1.5deg); }
+  }
+  #overlay-title{ color:var(--primary-dark); text-align:center; margin:0; font-size:23px; }
+  #overlay-desc{ color:#4a4260; text-align:center; margin-top:8px; font-size:14.5px; font-weight:600; line-height:1.4; }
+  .start-btn{
+    margin-top:26px; background:var(--primary); color:white; border:none;
+    padding:15px 34px; border-radius:30px; font-size:18px; font-weight:700;
+    cursor:pointer; box-shadow:0 6px 0 var(--primary-dark); transition: transform 0.1s ease;
+  }
+  .start-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 var(--primary-dark); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="sky-decor">
+  <div class="sun-wrap">
+    <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="14" fill="var(--sun)"/>
+      <g stroke="var(--sun)" stroke-width="4" stroke-linecap="round">
+        <line x1="30" y1="2" x2="30" y2="10"/><line x1="30" y1="50" x2="30" y2="58"/>
+        <line x1="2" y1="30" x2="10" y2="30"/><line x1="50" y1="30" x2="58" y2="30"/>
+        <line x1="9" y1="9" x2="15" y2="15"/><line x1="45" y1="45" x2="51" y2="51"/>
+        <line x1="51" y1="9" x2="45" y2="15"/><line x1="15" y1="45" x2="9" y2="51"/>
+      </g>
+    </svg>
+  </div>
+  <div class="cloud c1"><svg viewBox="0 0 100 50"><ellipse cx="30" cy="30" rx="26" ry="16" fill="white"/><ellipse cx="55" cy="22" rx="22" ry="18" fill="white"/><ellipse cx="75" cy="32" rx="18" ry="13" fill="white"/></svg></div>
+  <div class="cloud c2"><svg viewBox="0 0 100 50"><ellipse cx="30" cy="30" rx="26" ry="16" fill="white"/><ellipse cx="55" cy="22" rx="22" ry="18" fill="white"/><ellipse cx="75" cy="32" rx="18" ry="13" fill="white"/></svg></div>
+  <div class="cloud c3"><svg viewBox="0 0 100 50"><ellipse cx="30" cy="30" rx="26" ry="16" fill="white"/><ellipse cx="55" cy="22" rx="22" ry="18" fill="white"/><ellipse cx="75" cy="32" rx="18" ry="13" fill="white"/></svg></div>
+</div>
+
+<div id="game-view">
+  <div id="top-bar">
+    <div class="pill">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h13l3 3v13H4V4z" fill="#7C5CFF"/><path d="M7 8h9M7 11h9M7 14h6" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span>Estación <b id="ui-level">1/3</b></span>
+    </div>
+    <div class="pill">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.1 5.7 20.8l1.7-6.9L2 9.2l7.1-.6z" fill="var(--gold)"/></svg>
+      <span id="score">0</span>
+    </div>
+    <button id="mute-btn" onclick="toggleMute()" aria-label="Silenciar sonido">
+      <svg id="mute-icon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="var(--ink)"/><path id="wave1" d="M16.5 8.5a5 5 0 010 7" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path id="wave2" d="M19 6a8.5 8.5 0 010 12" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div id="level-title">Cargando...</div>
+  <div id="level-sub">Pregunta <span id="ui-q-current">1</span> de <span id="ui-q-total">2</span></div>
+
+  <div id="race-wrap">
+    <div id="race-track">
+      <svg id="den" viewBox="0 0 40 34"><ellipse cx="20" cy="30" rx="18" ry="4" fill="rgba(0,0,0,0.15)"/><path d="M4 30 Q4 6 20 6 Q36 6 36 30z" fill="#8a5a34"/><ellipse cx="20" cy="30" rx="10" ry="9" fill="#3d2517"/></svg>
+      <div id="racer-rabbit" class="run-bounce" style="left:76%">
+        <svg viewBox="0 0 60 50">
+          <ellipse cx="30" cy="27" rx="4" ry="8" fill="var(--rabbit-shadow)" opacity="0.4"/>
+          <ellipse cx="24" cy="34" rx="17" ry="12" fill="var(--rabbit)"/>
+          <circle cx="46" cy="24" r="10" fill="var(--rabbit)"/>
+          <ellipse transform="rotate(-25 40 12)" cx="40" cy="12" rx="4.5" ry="13" fill="var(--rabbit)"/>
+          <ellipse transform="rotate(-25 40 12)" cx="40" cy="12" rx="2" ry="9" fill="#F4B8C6"/>
+          <ellipse transform="rotate(10 50 10)" cx="50" cy="10" rx="4.5" ry="13" fill="var(--rabbit)"/>
+          <ellipse transform="rotate(10 50 10)" cx="50" cy="10" rx="2" ry="9" fill="#F4B8C6"/>
+          <circle cx="9" cy="35" r="6" fill="white"/>
+          <circle cx="50" cy="21" r="1.6" fill="#2E2140"/>
+          <circle cx="55" cy="26" r="1.6" fill="#F4B8C6"/>
+          <ellipse cx="16" cy="42" rx="5" ry="3" fill="var(--rabbit-shadow)"/>
+          <ellipse cx="34" cy="43" rx="5" ry="3" fill="var(--rabbit-shadow)"/>
+        </svg>
+      </div>
+      <div id="racer-fox" class="run-bounce" style="left:4%">
+        <svg viewBox="0 0 60 50">
+          <ellipse cx="26" cy="34" rx="19" ry="12" fill="var(--fox)"/>
+          <ellipse cx="20" cy="38" rx="10" ry="6" fill="var(--fox-belly)"/>
+          <circle cx="48" cy="23" r="11" fill="var(--fox)"/>
+          <polygon points="55,15 60,26 49,24" fill="var(--fox)"/>
+          <polygon transform="rotate(-20 40 10)" points="35,3 45,3 40,15" fill="var(--fox)"/>
+          <polygon transform="rotate(-20 40 10)" points="37,6 43,6 40,13" fill="#FFD9B0"/>
+          <polygon transform="rotate(20 52 10)" points="47,3 57,3 52,15" fill="var(--fox)"/>
+          <polygon transform="rotate(20 52 10)" points="49,6 55,6 52,13" fill="#FFD9B0"/>
+          <circle cx="53" cy="21" r="1.7" fill="#2E2140"/>
+          <circle cx="58" cy="25" r="1.3" fill="#2E2140"/>
+          <ellipse cx="8" cy="30" rx="9" ry="5" fill="var(--fox)" transform="rotate(-15 8 30)"/>
+          <ellipse cx="4" cy="28" rx="4" ry="3.4" fill="white" transform="rotate(-15 4 28)"/>
+          <ellipse cx="14" cy="43" rx="5" ry="3" fill="var(--fox-dark)"/>
+          <ellipse cx="34" cy="44" rx="5" ry="3" fill="var(--fox-dark)"/>
+        </svg>
+      </div>
+      <svg id="poof-svg" class="poof" viewBox="0 0 40 40" style="left:80%">
+        <circle cx="12" cy="20" r="8" fill="white"/><circle cx="24" cy="14" r="10" fill="white"/><circle cx="30" cy="24" r="7" fill="white"/>
+      </svg>
+    </div>
+    <div id="time-label">⏱ <span id="time-num">10</span> segundos</div>
+  </div>
+
+  <div id="paw-progress"></div>
+
+  <div id="question-container">
+    <div id="level-icon-wrap"></div>
+    <div id="question">Cargando pregunta...</div>
+    <div id="options"></div>
+  </div>
+</div>
+
+<div id="popup"></div>
+<div id="confetti-layer"></div>
+
+<div id="level-overlay" class="active">
+  <div id="mascot-wrap">
+    <svg viewBox="0 0 120 120">
+      <ellipse cx="60" cy="100" rx="30" ry="7" fill="rgba(0,0,0,0.08)"/>
+      <ellipse cx="58" cy="72" rx="34" ry="26" fill="var(--fox)"/>
+      <ellipse cx="50" cy="82" rx="19" ry="14" fill="var(--fox-belly)"/>
+      <circle cx="80" cy="45" r="22" fill="var(--fox)"/>
+      <polygon transform="rotate(-18 66 18)" points="58,2 78,2 68,26" fill="var(--fox)"/>
+      <polygon transform="rotate(-18 66 18)" points="62,7 74,7 68,22" fill="#FFD9B0"/>
+      <polygon transform="rotate(18 96 18)" points="88,2 108,2 98,26" fill="var(--fox)"/>
+      <polygon transform="rotate(18 96 18)" points="92,7 104,7 98,22" fill="#FFD9B0"/>
+      <polygon points="98,32 112,50 88,48" fill="var(--fox)"/>
+      <ellipse cx="106" cy="46" rx="3.5" ry="3" fill="#2E2140"/>
+      <circle cx="90" cy="40" r="2.6" fill="#2E2140"/>
+      <path d="M50 62 Q80 74 55 100" stroke="none" fill="var(--fox-dark)" opacity="0"/>
+      <rect x="46" y="30" width="26" height="14" rx="7" fill="#5B3A29" transform="rotate(-10 59 37)"/>
+      <rect x="40" y="24" width="34" height="10" rx="5" fill="#3D2517" transform="rotate(-10 57 29)"/>
+      <circle cx="24" cy="86" r="7" fill="#3D2517"/>
+      <rect x="21" y="70" width="6" height="18" rx="3" fill="#B0B0B0"/>
+      <circle cx="24" cy="68" r="6" fill="#DADADA"/>
+      <ellipse cx="10" cy="66" rx="10" ry="7" fill="var(--fox)" transform="rotate(-25 10 66)"/>
+    </svg>
+  </div>
+  <h1 id="overlay-title">Las 3 Estaciones del Reportero</h1>
+  <p id="overlay-desc">¿Listo para demostrar tus habilidades periodísticas junto al zorro reportero?</p>
+  <button class="start-btn" onclick="startLevel()">¡Comenzar!</button>
+</div>
+
+<script>
+  const gameData = [
+    {
+      name: "Nivel 1: El Detector de Noticias",
+      desc: "Identifica las partes clave de un artículo.",
+      icon: "newspaper",
+      questions: [
+        { q: "¿Cuál es la pregunta de la entrevista que busca saber la fecha de un evento?", a: ["¿Dónde fue?", "¿Quién asistió?", "¿Cuándo sucedió?"], correct: 2 },
+        { q: "Texto breve que va debajo de una fotografía en el periódico para explicar la imagen:", a: ["Título", "Pie de foto", "Moraleja"], correct: 1 }
+      ]
+    },
+    {
+      name: "Nivel 2: La Lupa Ortográfica",
+      desc: "Demuestra tu dominio de la puntuación y redacción.",
+      icon: "pencil",
+      questions: [
+        { q: "¿Cuál oración está escrita correctamente para hacer una pregunta al director?", a: ["¿A qué hora empieza el torneo de fútbol en la escuela?", "A qué hora empieza el torneo de fútbol en la escuela?", "¡A qué hora empieza el torneo de fútbol en la escuela!"], correct: 0 },
+        { q: "Uso de signos: ¿Qué signos se usan para expresar sorpresa o emoción en una nota informativa?", a: ["Signos de interrogación (¿?)", "Signos de admiración (¡!)"], correct: 1 }
+      ]
+    },
+    {
+      name: "Nivel 3: Ética y Entrevistas",
+      desc: "Demuestra cómo convivir y tratar a tu comunidad.",
+      icon: "handshake",
+      questions: [
+        { q: "Antes de iniciar una entrevista a un maestro o compañero, lo primero que debes hacer es:", a: ["Empezar a escribir sin hablar.", "Saludar con respeto y explicar de qué trata tu proyecto.", "Tomarle una foto de sorpresa."], correct: 1 }
+      ]
+    }
+  ];
+
+  const icons = {
+    newspaper: '<svg viewBox="0 0 48 48"><rect x="6" y="8" width="36" height="32" rx="3" fill="#7C5CFF"/><rect x="11" y="14" width="12" height="10" rx="1.5" fill="white"/><rect x="26" y="14" width="11" height="4" rx="1" fill="white"/><rect x="26" y="20" width="11" height="4" rx="1" fill="white"/><rect x="11" y="27" width="26" height="3" rx="1.2" fill="white"/><rect x="11" y="33" width="26" height="3" rx="1.2" fill="white"/></svg>',
+    pencil: '<svg viewBox="0 0 48 48"><rect x="7" y="10" width="26" height="30" rx="3" fill="white" stroke="#7C5CFF" stroke-width="2.5"/><rect x="12" y="16" width="16" height="2.6" rx="1.3" fill="#DCD1FF"/><rect x="12" y="22" width="16" height="2.6" rx="1.3" fill="#DCD1FF"/><rect x="12" y="28" width="10" height="2.6" rx="1.3" fill="#DCD1FF"/><g transform="translate(27,25) rotate(45)"><rect x="0" y="-4" width="20" height="8" rx="2" fill="#FFC93C"/><polygon points="20,-4 26,0 20,4" fill="#FF8C42"/><rect x="-3" y="-4" width="4" height="8" fill="#7C5CFF"/></g></svg>',
+    handshake: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#FFF3E4"/><path d="M10 24l7-6 5 4 5-4 7 6-4 5-3-2-3 4-3-4-3 2z" fill="#FF8C42"/><circle cx="24" cy="12" r="4" fill="#7C5CFF"/></svg>'
+  };
+
+  let currentLevel = 0, currentQuestion = 0, score = 0, timeLeft = 10, timerInterval = null;
+  let muted = false, audioCtx = null, questionLocked = false;
+
+  /* ---------------- Sonido ---------------- */
+  function ensureAudio(){
+    if(!audioCtx){
+      try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+    }
+    if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+  }
+  function tone(freq, start, dur, type='sine', peakGain=0.18){
+    if(!audioCtx || muted) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    const t0 = audioCtx.currentTime + start;
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(peakGain, t0 + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  }
+  function playCorrectSound(){ tone(523,0,0.16,'triangle'); tone(659,0.09,0.16,'triangle'); tone(784,0.18,0.22,'triangle'); }
+  function playWrongSound(){ tone(300,0,0.18,'sawtooth',0.12); tone(220,0.1,0.24,'sawtooth',0.12); }
+  function playTimeoutSound(){ tone(392,0,0.14,'square',0.1); tone(261,0.13,0.22,'square',0.1); }
+  function playLevelUpSound(){ tone(523,0,0.15,'triangle'); tone(659,0.12,0.15,'triangle'); tone(784,0.24,0.15,'triangle'); tone(1047,0.38,0.3,'triangle'); }
+  function playClickSound(){ tone(700,0,0.06,'sine',0.08); }
+
+  function toggleMute(){
+    ensureAudio();
+    muted = !muted;
+    document.getElementById('wave1').style.opacity = muted ? 0.15 : 1;
+    document.getElementById('wave2').style.opacity = muted ? 0.15 : 1;
+  }
+
+  /* ---------------- Overlay ---------------- */
+  function showOverlay(title, desc, btnText){
+    document.getElementById('overlay-title').innerText = title;
+    document.getElementById('overlay-desc').innerText = desc;
+    document.querySelector('.start-btn').innerText = btnText;
+    document.getElementById('level-overlay').classList.add('active');
+  }
+
+  function startLevel(){
+    ensureAudio();
+    playClickSound();
+    document.getElementById('level-overlay').classList.remove('active');
+    currentQuestion = 0;
+    loadQuestion();
+  }
+
+  /* ---------------- Preguntas ---------------- */
+  function renderPaws(total, answered){
+    const wrap = document.getElementById('paw-progress');
+    wrap.innerHTML = '';
+    for(let i=0;i<total;i++){
+      const span = document.createElement('span');
+      span.className = 'paw' + (i < answered ? ' filled' : '');
+      span.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="15" r="6" fill="#7C5CFF"/><circle cx="5" cy="7" r="3" fill="#7C5CFF"/><circle cx="12" cy="4" r="3" fill="#7C5CFF"/><circle cx="19" cy="7" r="3" fill="#7C5CFF"/></svg>';
+      wrap.appendChild(span);
+    }
+  }
+
+  function loadQuestion(){
+    questionLocked = false;
+    const levelData = gameData[currentLevel];
+    const qData = levelData.questions[currentQuestion];
+
+    document.getElementById('ui-level').innerText = `${currentLevel + 1}/${gameData.length}`;
+    document.getElementById('level-title').innerText = levelData.name;
+    document.getElementById('ui-q-current').innerText = currentQuestion + 1;
+    document.getElementById('ui-q-total').innerText = levelData.questions.length;
+    document.getElementById('score').innerText = score;
+    document.getElementById('level-icon-wrap').innerHTML = icons[levelData.icon] || '';
+
+    renderPaws(levelData.questions.length, currentQuestion);
+
+    document.getElementById('question').innerText = qData.q;
+
+    const opts = document.getElementById('options');
+    opts.innerHTML = '';
+    qData.a.forEach((txt, i) => {
+      const b = document.createElement('div');
+      b.className = 'btn';
+      b.innerText = txt;
+      b.onclick = () => checkAnswer(i, b);
+      opts.appendChild(b);
+    });
+
+    resetRace();
+    startTimer();
+  }
+
+  /* ---------------- Carrera / temporizador ---------------- */
+  function resetRace(){
+    document.getElementById('racer-fox').style.left = '4%';
+    document.getElementById('racer-rabbit').style.left = '76%';
+    document.getElementById('poof-svg').classList.remove('show');
+    document.getElementById('racer-rabbit').style.opacity = 1;
+    document.getElementById('time-num').innerText = 10;
+    document.getElementById('time-label').style.color = '';
+  }
+
+  function updateRace(t){
+    // el zorro avanza de 4% a 70% conforme baja el tiempo; el conejo se aleja un poco al inicio
+    const progress = (10 - t) / 10;
+    const foxLeft = 4 + progress * 66;
+    document.getElementById('racer-fox').style.left = foxLeft + '%';
+    if(t <= 3){
+      document.getElementById('time-label').style.color = '#FFD9D9';
+    }
+  }
+
+  function startTimer(){
+    timeLeft = 10;
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById('time-num').innerText = Math.max(timeLeft, 0);
+      updateRace(timeLeft);
+      if(timeLeft <= 0){
+        clearInterval(timerInterval);
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  /* ---------------- Respuestas ---------------- */
+  function lockButtons(){
+    document.querySelectorAll('.btn').forEach(btn => btn.style.pointerEvents = 'none');
+  }
+
+  function checkAnswer(selectedIndex, buttonElement){
+    if(questionLocked) return;
+    questionLocked = true;
+    clearInterval(timerInterval);
+    lockButtons();
+
+    const correctIndex = gameData[currentLevel].questions[currentQuestion].correct;
+    const allBtns = document.querySelectorAll('.btn');
+
+    if(selectedIndex === correctIndex){
+      buttonElement.classList.add('correct');
+      score += 100;
+      bumpScore();
+      spawnConfetti();
+      showFloatingFeedback(true, "¡ACERTASTE!");
+      playCorrectSound();
+    } else {
+      buttonElement.classList.add('wrong');
+      allBtns[correctIndex].classList.add('correct');
+      showFloatingFeedback(false, "¡CASI!");
+      playWrongSound();
+    }
+  }
+
+  function handleTimeout(){
+    if(questionLocked) return;
+    questionLocked = true;
+    lockButtons();
+    const correctIndex = gameData[currentLevel].questions[currentQuestion].correct;
+    const allBtns = document.querySelectorAll('.btn');
+    allBtns[correctIndex].classList.add('correct');
+
+    // el zorro alcanza al conejo, aparece un "poof" juguetón
+    document.getElementById('racer-fox').style.left = '72%';
+    const poof = document.getElementById('poof-svg');
+    poof.style.left = '78%';
+    poof.classList.add('show');
+    document.getElementById('racer-rabbit').style.opacity = 0;
+
+    showFloatingFeedback(false, "¡TIEMPO FUERA!");
+    playTimeoutSound();
+  }
+
+  function bumpScore(){
+    const el = document.getElementById('score');
+    el.innerText = score;
+    el.classList.add('bump');
+    setTimeout(() => el.classList.remove('bump'), 260);
+  }
+
+  /* ---------------- Confeti ---------------- */
+  function spawnConfetti(){
+    const layer = document.getElementById('confetti-layer');
+    const colors = ['#7C5CFF','#FFC93C','#FF8C42','#3FB950','#FF6B6B','#5EC8F2'];
+    for(let i=0;i<26;i++){
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      const size = 6 + Math.random()*6;
+      p.style.width = size + 'px';
+      p.style.height = (size*0.4) + 'px';
+      p.style.left = (Math.random()*100) + '%';
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      p.style.animationDuration = (1.1 + Math.random()*0.9) + 's';
+      p.style.transform = `rotate(${Math.random()*360}deg)`;
+      layer.appendChild(p);
+      setTimeout(() => p.remove(), 2200);
+    }
+  }
+
+  /* ---------------- Popup ---------------- */
+  const popupIcons = {
+    correct: '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="28" fill="#3FB950"/><path d="M18 31l8 8 16-17" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    wrong: '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="28" fill="#FF8C42"/><path d="M20 20l20 20M40 20l-20 20" stroke="white" stroke-width="4.5" stroke-linecap="round"/></svg>',
+    timeout: '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="28" fill="#FF6B6B"/><path d="M30 16v14l9 9" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+
+  function showFloatingFeedback(isCorrect, text){
+    const popup = document.getElementById('popup');
+    let icon = isCorrect ? popupIcons.correct : (text.includes('TIEMPO') ? popupIcons.timeout : popupIcons.wrong);
+    popup.innerHTML = icon + `<span style="color:${isCorrect ? '#2ea043' : '#e8672b'}">${text}</span>`;
+
+    popup.classList.remove('show-popup');
+    void popup.offsetWidth;
+    popup.classList.add('show-popup');
+
+    setTimeout(() => {
+      popup.classList.remove('show-popup');
+      nextQuestion();
+    }, 1250);
+  }
+
+  /* ---------------- Progresión ---------------- */
+  function nextQuestion(){
+    currentQuestion++;
+    const levelData = gameData[currentLevel];
+
+    if(currentQuestion < levelData.questions.length){
+      loadQuestion();
+    } else {
+      clearInterval(timerInterval);
+      currentLevel++;
+      playLevelUpSound();
+      if(currentLevel < gameData.length){
+        showOverlay(
+          "¡Nivel Completado! 🎉",
+          `Desbloqueaste: ${gameData[currentLevel].name}`,
+          "Siguiente Nivel"
+        );
+      } else {
+        showOverlay(
+          "¡Felicidades Reportero! 🏆",
+          `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`,
+          "Jugar de nuevo"
+        );
+        currentLevel = 0;
+        score = 0;
+      }
+    }
+  }
+
+  // Estado inicial de los botones de mute (visual)
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('time-num').innerText = 10;
+  });
+</script>
+</body>
+</html>
