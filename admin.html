@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Administración - Reporteros</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #7C5CFF;
+    --primary-dark: #5E3FE0;
+    --success: #3FB950;
+    --error: #FF6B6B;
+    --ink: #2E2140;
+    --bg: #F4F7F6;
+    --card: #FFFFFF;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--bg);
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* --- PANTALLA DE LOGIN --- */
+  #login-screen {
+    background: var(--card);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  #login-screen h2 { margin-top: 0; color: var(--primary-dark); }
+  
+  input[type="password"], input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+  }
+  input:focus { border-color: var(--primary); }
+
+  .btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:hover { background: var(--primary-dark); }
+  .btn-danger { background: var(--error); width: auto; padding: 8px 16px; font-size: 14px; }
+  .btn-success { background: var(--success); width: auto; padding: 8px 16px; font-size: 14px; }
+  .btn-small { width: auto; padding: 8px 16px; font-size: 14px; }
+
+  /* --- PANEL DE ADMINISTRACIÓN --- */
+  #admin-screen {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    background: var(--card);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    margin: 20px;
+  }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+
+  .admin-header h2 { margin: 0; color: var(--primary-dark); }
+
+  .bulk-actions {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  th { background: #f8f9fa; color: #6b6280; }
+  
+  .edit-mode input {
+    margin: 0;
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  .actions-cell { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE LOGIN -->
+<div id="login-screen">
+  <h2>Acceso Restringido</h2>
+  <p style="color: #666; font-size: 14px;">Ingresa la contraseña de administrador</p>
+  <input type="password" id="admin-pass" placeholder="Contraseña..." onkeypress="if(event.key === 'Enter') login()">
+  <button class="btn" onclick="login()">Entrar</button>
+  <p id="login-error" style="color: var(--error); display: none; margin-top: 10px; font-weight: bold;">Contraseña incorrecta</p>
+</div>
+
+<!-- PANEL DE ADMINISTRACIÓN -->
+<div id="admin-screen">
+  <div class="admin-header">
+    <h2>Gestión de Jugadores</h2>
+    <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+  </div>
+
+  <div class="bulk-actions">
+    <button class="btn btn-danger" onclick="deleteSelected()">Eliminar Seleccionados</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 40px;"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
+        <th>Nombre del Jugador</th>
+        <th>Puntos</th>
+        <th>Fecha de Registro</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="players-table-body">
+      <!-- Los datos se inyectarán aquí -->
+    </tbody>
+  </table>
+</div>
+
+<!-- SDKs de Firebase (Versión 8) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+  // 1. Configuración de Firebase (PON TUS DATOS AQUÍ)
+  const firebaseConfig = {
+  apiKey: "AIzaSyDJaoXKhI8QJ0i36hicpGGC21gDRAvMDRg",
+  authDomain: "quizzrepor.firebaseapp.com",
+  projectId: "quizzrepor",
+  storageBucket: "quizzrepor.firebasestorage.app",
+  messagingSenderId: "648203197422",
+  appId: "1:648203197422:web:f9d022df1f26574103ccff"
+  };
+  
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.firestore();
+
+  let unsubscribe = null; // Para detener la escucha de la base de datos al cerrar sesión
+
+  // --- LÓGICA DE LOGIN ---
+  async function login() {
+    const passInput = document.getElementById('admin-pass').value;
+    const errorMsg = document.getElementById('login-error');
+    
+    if(!passInput) return;
+
+    try {
+      // Buscar la contraseña en Firestore
+      const configRef = db.collection("config").doc("admin");
+      const doc = await configRef.get();
+
+      let realPassword = "";
+
+      if (doc.exists) {
+        realPassword = doc.data().password;
+      } else {
+        // Si no existe, creamos el documento con la contraseña que pediste por defecto
+        await configRef.set({ password: "20052026" });
+        realPassword = "20052026";
+      }
+
+      if (passInput === realPassword) {
+        // Login exitoso
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        errorMsg.style.display = 'none';
+        document.getElementById('admin-pass').value = '';
+        
+        loadPlayers(); // Cargar la tabla
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    } catch (error) {
+      console.error("Error conectando a Firebase:", error);
+      alert("Error de conexión. Revisa la consola.");
+    }
+  }
+
+  function logout() {
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'block';
+    if(unsubscribe) unsubscribe(); // Detener actualizaciones en tiempo real
+  }
+
+  // --- LÓGICA DE LA TABLA (CRUD) ---
+  function loadPlayers() {
+    const tbody = document.getElementById('players-table-body');
+    
+    // onSnapshot mantiene la tabla actualizada en tiempo real
+    unsubscribe = db.collection("leaderboard").orderBy("score", "desc").onSnapshot((snapshot) => {
+      tbody.innerHTML = '';
+      
+      if (snapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay jugadores registrados.</td></tr>';
+        return;
+      }
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const id = doc.id;
+        const dateStr = data.date ? data.date.toDate().toLocaleString('es-MX') : 'Desconocida';
+
+        // Fila normal
+        const tr = document.createElement('tr');
+        tr.id = `row-${id}`;
+        tr.innerHTML = `
+          <td><input type="checkbox" class="player-checkbox" value="${id}"></td>
+          <td id="name-${id}">${data.name}</td>
+          <td id="score-${id}">${data.score}</td>
+          <td>${dateStr}</td>
+          <td class="actions-cell">
+            <button class="btn btn-small" onclick="enableEdit('${id}')">Editar</button>
+            <button class="btn btn-danger btn-small" onclick="deletePlayer('${id}')">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  }
+
+  // --- EDICIÓN ---
+  function enableEdit(id) {
+    const nameTd = document.getElementById(`name-${id}`);
+    const scoreTd = document.getElementById(`score-${id}`);
+    
+    const currentName = nameTd.innerText;
+    const currentScore = scoreTd.innerText;
+
+    // Cambiar a inputs
+    nameTd.innerHTML = `<input type="text" id="edit-name-${id}" value="${currentName}">`;
+    scoreTd.innerHTML = `<input type="number" id="edit-score-${id}" value="${currentScore}">`;
+
+    // Cambiar botones
+    const actionsTd = document.querySelector(`#row-${id} .actions-cell`);
+    actionsTd.innerHTML = `
+      <button class="btn btn-success btn-small" onclick="saveEdit('${id}')">Guardar</button>
+      <button class="btn btn-danger btn-small" onclick="cancelEdit('${id}', '${currentName}', '${currentScore}')">Cancelar</button>
+    `;
+  }
+
+  function cancelEdit(id, oldName, oldScore) {
+    // Si cancela, devolvemos el texto original y esperamos al onSnapshot para regenerar los botones
+    document.getElementById(`name-${id}`).innerText = oldName;
+    document.getElementById(`score-${id}`).innerText = oldScore;
+    // Forzamos la recarga leyendo de nuevo (onSnapshot se encarga de arreglar la fila en un segundo)
+  }
+
+  function saveEdit(id) {
+    const newName = document.getElementById(`edit-name-${id}`).value.trim();
+    const newScore = parseInt(document.getElementById(`edit-score-${id}`).value);
+
+    if (!newName || isNaN(newScore)) {
+      alert("Por favor ingresa datos válidos.");
+      return;
+    }
+
+    db.collection("leaderboard").doc(id).update({
+      name: newName,
+      score: newScore
+    }).then(() => {
+      console.log("Actualizado con éxito");
+      // No necesitamos actualizar el HTML manualmente porque onSnapshot lo hará por nosotros
+    }).catch(error => {
+      console.error("Error al actualizar:", error);
+      alert("Hubo un error al guardar.");
+    });
+  }
+
+  // --- ELIMINACIÓN INDIVIDUAL ---
+  function deletePlayer(id) {
+    if(confirm("¿Estás seguro de que quieres eliminar a este jugador?")) {
+      db.collection("leaderboard").doc(id).delete();
+    }
+  }
+
+  // --- ELIMINACIÓN MÚLTIPLE ---
+  function toggleSelectAll() {
+    const selectAllCheck = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.player-checkbox');
+    checkboxes.forEach(cb => cb.checked = selectAllCheck.checked);
+  }
+
+  function deleteSelected() {
+    const checkboxes = document.querySelectorAll('.player-checkbox:checked');
+    if (checkboxes.length === 0) {
+      alert("Selecciona al menos un jugador para eliminar.");
+      return;
+    }
+
+    if(confirm(`¿Estás seguro de eliminar ${checkboxes.length} jugadores de golpe?`)) {
+      // Ejecutamos las eliminaciones en lote (batch) o con promesas
+      const batch = db.batch();
+      
+      checkboxes.forEach(cb => {
+        const docRef = db.collection("leaderboard").doc(cb.value);
+        batch.delete(docRef);
+      });
+
+      batch.commit().then(() => {
+        document.getElementById('select-all').checked = false;
+        console.log("Jugadores eliminados");
+      }).catch(err => {
+        console.error("Error en el borrado múltiple:", err);
+      });
+    }
+  }
+</script>
+</body>
+</html>
