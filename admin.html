@@ -200,9 +200,6 @@
       if (doc.exists) {
         realPassword = doc.data().password;
       } else {
-        // Si no existe, creamos el documento con la contraseña que pediste por defecto
-        await configRef.set({ password: "20052026" });
-        realPassword = "20052026";
       }
 
       if (passInput === realPassword) {
