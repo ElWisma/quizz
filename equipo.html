@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-top: #7EC8E3;
+    --sky-bottom: #DFF6FF;
+    --sun: #FFD166;
+    --ink: #2E2140;
+    --card: #FFFFFF;
+    --primary: #7C5CFF;
+    --primary-dark: #5E3FE0;
+    --success: #3FB950;
+    --success-dark: #2ea043;
+    --gold: #FFC93C;
+    --gold-dark: #d4a017;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 55%, #EFF9E5 100%);
+    color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3 { font-family: 'Baloo 2', sans-serif; }
+
+  /* ---------- Fondo decorativo ---------- */
+  #sky-decor { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .cloud { position: absolute; opacity: 0.9; animation: drift 40s linear infinite; }
+  .cloud svg { width: 90px; }
+  .cloud.c1 { top: 6%; left: -20%; animation-duration: 46s; }
+  .cloud.c2 { top: 14%; left: -40%; animation-duration: 60s; animation-delay: -10s; transform: scale(0.7); }
+  .cloud.c3 { top: 3%; left: -60%; animation-duration: 52s; animation-delay: -25s; transform: scale(0.55); }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(160vw); } }
+
+  .sun-wrap { position: absolute; top: 18px; right: 18px; width: 54px; height: 54px; animation: spin 30s linear infinite; }
+  @keyframes spin { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+
+  /* ---------- Tarjeta del Menú ---------- */
+  #dashboard-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+    z-index: 1;
+    backdrop-filter: blur(5px);
+    margin: 20px;
+  }
+
+  #dashboard-card h1 {
+    margin: 0 0 5px 0;
+    color: var(--primary-dark);
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  #dashboard-card p {
+    color: #6b6280;
+    margin: 0 0 25px 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  /* ---------- Botones Enlaces ---------- */
+  .link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-decoration: none;
+    padding: 16px;
+    margin: 15px 0;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  
+  .link-btn svg { width: 24px; height: 24px; }
+
+  .link-btn:active { transform: translateY(4px); }
+
+  /* Colores específicos de cada botón */
+  .btn-game {
+    background: var(--success);
+    color: white;
+    box-shadow: 0 6px 0 var(--success-dark);
+  }
+  .btn-game:active { box-shadow: 0 2px 0 var(--success-dark); }
+
+  .btn-admin {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 6px 0 var(--primary-dark);
+  }
+  .btn-admin:active { box-shadow: 0 2px 0 var(--primary-dark); }
+
+  .btn-podio {
+    background: var(--gold);
+    color: var(--ink);
+    box-shadow: 0 6px 0 var(--gold-dark);
+  }
+  .btn-podio:active { box-shadow: 0 2px 0 var(--gold-dark); }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; } }
+</style>
+</head>
+<body>
+
+<!-- Cielo Decorativo -->
+<div id="sky-decor">
+  <div class="sun-wrap">
+    <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="14" fill="var(--sun)"/>
+      <g stroke="var(--sun)" stroke-width="4" stroke-linecap="round">
+        <line x1="30" y1="2" x2="30" y2="10"/><line x1="30" y1="50" x2="30" y2="58"/>
+        <line x1="2" y1="30" x2="10" y2="30"/><line x1="50" y1="30" x2="58" y2="30"/>
+        <line x1="9" y1="9" x2="15" y2="15"/><line x1="45" y1="45" x2="51" y2="51"/>
+        <line x1="51" y1="9" x2="45" y2="15"/><line x1="15" y1="45" x2="9" y2="51"/>
+      </g>
+    </svg>
+  </div>
+  <div class="cloud c1"><svg viewBox="0 0 100 50"><ellipse cx="30" cy="30" rx="26" ry="16" fill="white"/><ellipse cx="55" cy="22" rx="22" ry="18" fill="white"/><ellipse cx="75" cy="32" rx="18" ry="13" fill="white"/></svg></div>
+  <div class="cloud c2"><svg viewBox="0 0 100 50"><ellipse cx="30" cy="30" rx="26" ry="16" fill="white"/><ellipse cx="55" cy="22" rx="22" ry="18" fill="white"/><ellipse cx="75" cy="32" rx="18" ry="13" fill="white"/></svg></div>
+  <div class="cloud c3"><svg viewBox="0 0 100 50"><ellipse cx="30" cy="30" rx="26" ry="16" fill="white"/><ellipse cx="55" cy="22" rx="22" ry="18" fill="white"/><ellipse cx="75" cy="32" rx="18" ry="13" fill="white"/></svg></div>
+</div>
+
+<!-- Tarjeta Principal -->
+<div id="dashboard-card">
+  <h1>Portal de Acceso</h1>
+  <p>Panel exclusivo para administradores</p>
+
+  <!-- Botón 1: El Juego -->
+  <a href="https://elwisma.github.io/quizz/" class="link-btn btn-game">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+    Ir al Juego
+  </a>
+
+  <!-- Botón 2: El Podio -->
+  <a href="https://elwisma.github.io/quizz/podio.html" class="link-btn btn-podio">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+      <path d="M4 22h16"></path>
+      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+    </svg>
+    Ver el Podio
+  </a>
+
+  <!-- Botón 3: Panel de Administración -->
+  <a href="https://elwisma.github.io/quizz/admin.html" class="link-btn btn-admin">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+    Panel Admin
+  </a>
+</div>
+
+</body>
+</html>
