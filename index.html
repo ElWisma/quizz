@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Las 3 Estaciones del Reportero</title>
+<title>Las Preguntas Mágicas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -231,7 +231,7 @@
   <div id="top-bar">
     <div class="pill">
       <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h13l3 3v13H4V4z" fill="#7C5CFF"/><path d="M7 8h9M7 11h9M7 14h6" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <span>Estación <b id="ui-level">1/3</b></span>
+      <span>Nivel: <b id="ui-level">1/3</b></span>
     </div>
     <div class="pill">
       <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.1 5.7 20.8l1.7-6.9L2 9.2l7.1-.6z" fill="var(--gold)"/></svg>
@@ -328,14 +328,14 @@
       <ellipse cx="10" cy="66" rx="10" ry="7" fill="var(--fox)" transform="rotate(-25 10 66)"/>
     </svg>
   </div>
-  <h1 id="overlay-title">Las 3 Estaciones del Reportero</h1>
-  <p id="overlay-desc">¿Listo para demostrar tus habilidades periodísticas junto al zorro reportero?</p>
+  <h1 id="overlay-title">Las Preguntas Mágicas</h1>
+  <p id="overlay-desc">¿Listo para demostrar tus habilidades junto al zorro Foxym?</p>
   
   <input type="text" id="player-name-input" placeholder="Ingresa tu nombre..." maxlength="15">
   <button id="save-score-btn" class="start-btn save-btn" onclick="saveScore()">Guardar Puntuación</button>
   
   <div id="leaderboard-container">
-    <h3>Top Mejores Reporteros</h3>
+    <h3>Top Mejores Jugadore</h3>
     <table class="leaderboard-table">
       <thead>
         <tr><th>Rango</th><th>Nombre</th><th>Puntos</th></tr>
@@ -641,7 +641,7 @@
       if(currentLevel < gameData.length){
         showOverlay("¡Nivel Completado!", `Desbloqueaste: ${gameData[currentLevel].name}`, "Siguiente Nivel");
       } else {
-        showOverlay("¡Felicidades Reportero!", `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`, "Jugar de nuevo");
+        showOverlay("¡Felicidades!", `Terminaste el entrenamiento con ${score} puntos.`, "Jugar de nuevo");
         setupEndGameUI();
       }
     }
