@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Las Preguntas Mágicas</title>
+<title>Las 3 Estaciones del Reportero</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -120,7 +120,7 @@
   .paw{ width:16px; height:16px; opacity:0.35; transition: all 0.3s ease; }
   .paw.filled{ opacity:1; transform:scale(1.15); }
 
-  /* ---------- Pregunta ---------- */
+  /* ---------- Pregunta y NUEVA IMAGEN ---------- */
   #question-container{
     flex-grow:1; display:flex; flex-direction:column; justify-content:center;
     background:var(--card); border-radius:22px; padding:20px 16px;
@@ -128,6 +128,17 @@
   }
   #level-icon-wrap{ display:flex; justify-content:center; margin-bottom:8px; }
   #level-icon-wrap svg{ width:46px; height:46px; }
+  
+  #question-image {
+    display: none; /* Oculto por defecto */
+    max-width: 100%;
+    max-height: 130px;
+    object-fit: contain;
+    border-radius: 12px;
+    margin: 0 auto 15px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  }
+
   #question{ font-size:19px; font-weight:700; text-align:center; line-height:1.4; margin-bottom:20px; color:var(--ink); }
 
   .btn{
@@ -220,7 +231,7 @@
   <div id="top-bar">
     <div class="pill">
       <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h13l3 3v13H4V4z" fill="#7C5CFF"/><path d="M7 8h9M7 11h9M7 14h6" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
-      <span>Nivel <b id="ui-level">1/3</b></span>
+      <span>Estación <b id="ui-level">1/3</b></span>
     </div>
     <div class="pill">
       <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.1 5.7 20.8l1.7-6.9L2 9.2l7.1-.6z" fill="var(--gold)"/></svg>
@@ -282,6 +293,10 @@
 
   <div id="question-container">
     <div id="level-icon-wrap"></div>
+    
+    <!-- NUEVO CONTENEDOR DE IMAGEN -->
+    <img id="question-image" src="" alt="Imagen de la pregunta">
+    
     <div id="question">Cargando pregunta...</div>
     <div id="options"></div>
   </div>
@@ -313,24 +328,14 @@
       <ellipse cx="10" cy="66" rx="10" ry="7" fill="var(--fox)" transform="rotate(-25 10 66)"/>
     </svg>
   </div>
-  <h1 id="overlay-title">Las Preguntas Mágicas</h1>
-  <p id="overlay-desc">¿Listo para demostrar tus habilidades junto al zorro Foxym?</p>
-    <div id="leaderboard-container">
-    <h3>Top Mejores Reporteros</h3>
-    <table class="leaderboard-table">
-      <thead>
-        <tr><th>Rango</th><th>Nombre</th><th>Puntos</th></tr>
-      </thead>
-      <tbody id="leaderboard-body">
-      </tbody>
-    </table>
-  </div>
+  <h1 id="overlay-title">Las 3 Estaciones del Reportero</h1>
+  <p id="overlay-desc">¿Listo para demostrar tus habilidades periodísticas junto al zorro reportero?</p>
   
   <input type="text" id="player-name-input" placeholder="Ingresa tu nombre..." maxlength="15">
   <button id="save-score-btn" class="start-btn save-btn" onclick="saveScore()">Guardar Puntuación</button>
   
   <div id="leaderboard-container">
-    <h3>Top Mejores Jugadores</h3>
+    <h3>Top Mejores Reporteros</h3>
     <table class="leaderboard-table">
       <thead>
         <tr><th>Rango</th><th>Nombre</th><th>Puntos</th></tr>
@@ -361,15 +366,14 @@
   const db = firebase.firestore();
 
   // --- VARIABLES GLOBALES DEL JUEGO ---
-  // Hacemos gameData dinámico con let. Si falla Firebase, usamos este array como respaldo.
   let gameData = [
     {
       name: "Nivel 1: El Detector de Noticias",
       desc: "Identifica las partes clave de un artículo.",
       icon: "newspaper",
       questions: [
-        { q: "¿Cuál es la pregunta de la entrevista que busca saber la fecha de un evento?", a: ["¿Dónde fue?", "¿Quién asistió?", "¿Cuándo sucedió?"], correct: 2, points: 100 },
-        { q: "Texto breve que va debajo de una fotografía en el periódico para explicar la imagen:", a: ["Título", "Pie de foto", "Moraleja"], correct: 1, points: 100 }
+        { q: "¿Cuál es la pregunta de la entrevista que busca saber la fecha de un evento?", a: ["¿Dónde fue?", "¿Quién asistió?", "¿Cuándo sucedió?"], correct: 2, points: 100, time: 10, image: null },
+        { q: "Texto breve que va debajo de una fotografía en el periódico para explicar la imagen:", a: ["Título", "Pie de foto", "Moraleja"], correct: 1, points: 100, time: 10, image: null }
       ]
     },
     {
@@ -377,8 +381,8 @@
       desc: "Demuestra tu dominio de la puntuación y redacción.",
       icon: "pencil",
       questions: [
-        { q: "¿Cuál oración está escrita correctamente para hacer una pregunta al director?", a: ["¿A qué hora empieza el torneo de fútbol en la escuela?", "A qué hora empieza el torneo de fútbol en la escuela?", "¡A qué hora empieza el torneo de fútbol en la escuela!"], correct: 0, points: 100 },
-        { q: "Uso de signos: ¿Qué signos se usan para expresar sorpresa o emoción en una nota informativa?", a: ["Signos de interrogación (¿?)", "Signos de admiración (¡!)"], correct: 1, points: 100 }
+        { q: "¿Cuál oración está escrita correctamente para hacer una pregunta al director?", a: ["¿A qué hora empieza el torneo de fútbol en la escuela?", "A qué hora empieza el torneo de fútbol en la escuela?", "¡A qué hora empieza el torneo de fútbol en la escuela!"], correct: 0, points: 100, time: 15, image: null },
+        { q: "Uso de signos: ¿Qué signos se usan para expresar sorpresa o emoción en una nota informativa?", a: ["Signos de interrogación (¿?)", "Signos de admiración (¡!)"], correct: 1, points: 100, time: 10, image: null }
       ]
     }
   ];
@@ -390,22 +394,22 @@
   };
 
   let currentLevel = 0, currentQuestion = 0, score = 0, timeLeft = 10, timerInterval = null;
+  let currentTotalTime = 10; // Para calcular el porcentaje de la carrera
   let muted = false, audioCtx = null, questionLocked = false;
 
   /* ---------------- DESCARGAR PREGUNTAS AL INICIAR ---------------- */
   document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('time-num').innerText = 10;
     const startBtn = document.getElementById('main-start-btn');
     
     try {
       const doc = await db.collection("config").doc("gameData").get();
       if (doc.exists && doc.data().levels && doc.data().levels.length > 0) {
-        gameData = doc.data().levels; // Sobrescribir con las preguntas de la base de datos
+        gameData = doc.data().levels;
       }
       startBtn.innerText = "¡Comenzar!";
       startBtn.disabled = false;
     } catch(err) {
-      console.error("Error al cargar datos de Firebase, usando preguntas locales:", err);
+      console.error("Error al cargar datos, usando preguntas locales:", err);
       startBtn.innerText = "¡Comenzar! (Modo Offline)";
       startBtn.disabled = false;
     }
@@ -479,6 +483,9 @@
     const levelData = gameData[currentLevel];
     const qData = levelData.questions[currentQuestion];
 
+    // Asignar tiempo dinámico
+    currentTotalTime = qData.time || 10;
+
     document.getElementById('ui-level').innerText = `${currentLevel + 1}/${gameData.length}`;
     document.getElementById('level-title').innerText = levelData.name;
     document.getElementById('ui-q-current').innerText = currentQuestion + 1;
@@ -487,6 +494,17 @@
     document.getElementById('level-icon-wrap').innerHTML = icons[levelData.icon] || '';
 
     renderPaws(levelData.questions.length, currentQuestion);
+    
+    // Cargar la imagen (si existe)
+    const imgEl = document.getElementById('question-image');
+    if (qData.image) {
+      imgEl.src = qData.image;
+      imgEl.style.display = 'block';
+    } else {
+      imgEl.style.display = 'none';
+      imgEl.src = '';
+    }
+
     document.getElementById('question').innerText = qData.q;
 
     const opts = document.getElementById('options');
@@ -507,18 +525,21 @@
     document.getElementById('racer-rabbit').style.left = '76%';
     document.getElementById('poof-svg').classList.remove('show');
     document.getElementById('racer-rabbit').style.opacity = 1;
-    document.getElementById('time-num').innerText = 10;
+    document.getElementById('time-num').innerText = currentTotalTime;
     document.getElementById('time-label').style.color = '';
   }
 
   function updateRace(t){
-    const progress = (10 - t) / 10;
+    // Calculamos el progreso en base al tiempo total de esa pregunta
+    const progress = (currentTotalTime - t) / currentTotalTime;
     document.getElementById('racer-fox').style.left = (4 + progress * 66) + '%';
     if(t <= 3) document.getElementById('time-label').style.color = '#FFD9D9';
   }
 
   function startTimer(){
-    timeLeft = 10; clearInterval(timerInterval);
+    timeLeft = currentTotalTime; 
+    clearInterval(timerInterval);
+    
     timerInterval = setInterval(() => {
       timeLeft--;
       document.getElementById('time-num').innerText = Math.max(timeLeft, 0);
@@ -540,7 +561,7 @@
 
     if(selectedIndex === correctIndex){
       buttonElement.classList.add('correct');
-      // Sumar los puntos dinámicos (o 100 por defecto)
+      // Sumar los puntos dinámicos
       score += (qData.points || 100);
       bumpScore(); spawnConfetti();
       showFloatingFeedback(true, "¡ACERTASTE!");
@@ -620,7 +641,7 @@
       if(currentLevel < gameData.length){
         showOverlay("¡Nivel Completado!", `Desbloqueaste: ${gameData[currentLevel].name}`, "Siguiente Nivel");
       } else {
-        showOverlay("¡Felicidades!", `Terminaste el entrenamiento con ${score} puntos.`, "Jugar de nuevo");
+        showOverlay("¡Felicidades Reportero!", `Terminaste el entrenamiento con ${score} puntos. ¡Estás listo para salir a buscar la noticia!`, "Jugar de nuevo");
         setupEndGameUI();
       }
     }
