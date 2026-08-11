@@ -128,11 +128,18 @@
     border-left: 4px solid var(--primary);
   }
   
-  .flex-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-  .flex-row input[type="text"] { flex: 1; margin: 0; }
-  .flex-row input[type="number"] { width: 100px; margin: 0; }
+  .flex-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .flex-row input[type="text"] { flex: 1; margin: 0; min-width: 150px; }
+  .flex-row input[type="number"] { width: 90px; margin: 0; }
   .flex-row label { font-weight: bold; font-size: 13px; color: #6b6280; }
   
+  .image-preview-box {
+    display: flex; align-items: center; gap: 10px; 
+    background: #f4f7f6; padding: 8px 12px; border-radius: 8px; border: 1px dashed #ccc;
+    flex-grow: 1;
+  }
+  .image-preview-box img { max-height: 50px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
   .options-list { list-style: none; padding: 0; margin: 0; }
   .options-list li {
     display: flex; gap: 10px; align-items: center; margin-bottom: 8px;
@@ -163,7 +170,7 @@
   <!-- Pestañas de Navegación -->
   <div class="tabs">
     <button class="tab-btn active" id="btn-tab-leaderboard" onclick="switchTab('leaderboard')">Tabla de Jugadores</button>
-    <button class="tab-btn" id="btn-tab-editor" onclick="switchTab('editor')">Editor de Niveles</button>
+    <button class="tab-btn" id="btn-tab-editor" onclick="switchTab('editor')">Editor de Preguntas</button>
   </div>
 
   <!-- PESTAÑA 1: LEADERBOARD -->
@@ -190,7 +197,7 @@
   <!-- PESTAÑA 2: EDITOR DE NIVELES Y PREGUNTAS -->
   <div id="tab-editor" class="tab-content">
     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-      <p style="margin: 0; color: #6b6280;">Modifica los niveles, opciones y puntajes del juego.</p>
+      <p style="margin: 0; color: #6b6280;">Modifica las preguntas, opciones, temporizador e imágenes.</p>
       <button class="btn btn-success" onclick="saveGameDataToFirebase()">💾 Guardar Cambios en Firebase</button>
     </div>
     
@@ -210,19 +217,30 @@
 <script>
   // 1. Configuración de Firebase (PON TUS DATOS AQUÍ)
   const firebaseConfig = {
-  apiKey: "AIzaSyDJaoXKhI8QJ0i36hicpGGC21gDRAvMDRg",
-  authDomain: "quizzrepor.firebaseapp.com",
-  projectId: "quizzrepor",
-  storageBucket: "quizzrepor.firebasestorage.app",
-  messagingSenderId: "648203197422",
-  appId: "1:648203197422:web:f9d022df1f26574103ccff"
+    apiKey: "TU_API_KEY",
+    authDomain: "tu-proyecto.firebaseapp.com",
+    projectId: "tu-proyecto",
+    storageBucket: "tu-proyecto.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "TU_APP_ID"
   };
   
   if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
   const db = firebase.firestore();
 
   let unsubscribe = null; 
-  let gameLevelsData = []; // Array donde vivirá la información del editor
+  let gameLevelsData = [];
+
+  // --- LÓGICA DE AUTO-LOGIN (NUEVO) ---
+  document.addEventListener('DOMContentLoaded', () => {
+    // Si el navegador recuerda que ya iniciamos sesión
+    if (localStorage.getItem('admin_logged_in') === 'true') {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      loadPlayers();
+      loadGameData();
+    }
+  });
 
   // --- LÓGICA DE PESTAÑAS (TABS) ---
   function switchTab(tabName) {
@@ -241,13 +259,17 @@
     try {
       const doc = await db.collection("config").doc("admin").get();
       if (doc.exists && passInput === doc.data().password) {
+        
+        // Guardar la sesión en el navegador
+        localStorage.setItem('admin_logged_in', 'true');
+        
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').style.display = 'block';
         errorMsg.style.display = 'none';
         document.getElementById('admin-pass').value = '';
         
         loadPlayers(); 
-        loadGameData(); // Cargar datos del editor al iniciar
+        loadGameData(); 
       } else {
         errorMsg.style.display = 'block';
       }
@@ -258,13 +280,14 @@
   }
 
   function logout() {
+    localStorage.removeItem('admin_logged_in'); // Olvidar sesión
     document.getElementById('admin-screen').style.display = 'none';
     document.getElementById('login-screen').style.display = 'block';
     if(unsubscribe) unsubscribe();
   }
 
   /* =========================================================
-     ZONA 1: LEADERBOARD (Sin cambios a tu lógica original)
+     ZONA 1: LEADERBOARD
      ========================================================= */
   function loadPlayers() {
     const tbody = document.getElementById('players-table-body');
@@ -343,10 +366,9 @@
 
 
   /* =========================================================
-     ZONA 2: EDITOR DE PREGUNTAS (Nueva funcionalidad)
+     ZONA 2: EDITOR DE PREGUNTAS (Con tiempo e imágenes)
      ========================================================= */
 
-  // Función para escapar caracteres y evitar que comillas rompan los inputs
   function escapeHTML(str) {
     if(typeof str !== 'string') return str;
     return str.replace(/"/g, '&quot;');
@@ -355,16 +377,21 @@
   async function loadGameData() {
     try {
       const doc = await db.collection("config").doc("gameData").get();
-      if (doc.exists && doc.data().levels) {
+      if (doc.exists && doc.data().levels && doc.data().levels.length > 0) {
         gameLevelsData = doc.data().levels;
       } else {
-        // Si la base está vacía, cargamos un nivel de ejemplo básico
-        gameLevelsData = [{
-          name: "Nuevo Nivel", desc: "Descripción del nivel", icon: "newspaper",
-          questions: [
-            { q: "Pregunta de ejemplo", a: ["Opción A", "Opción B"], correct: 0, points: 100 }
-          ]
-        }];
+        // Datos por defecto si está vacío
+        gameLevelsData = [
+          {
+            name: "Nivel 1: El Detector de Noticias",
+            desc: "Identifica las partes clave de un artículo.",
+            icon: "newspaper",
+            questions: [
+              { q: "¿Cuál es la pregunta de la entrevista que busca saber la fecha de un evento?", a: ["¿Dónde fue?", "¿Quién asistió?", "¿Cuándo sucedió?"], correct: 2, points: 100, time: 10, image: null },
+              { q: "Texto breve que va debajo de una fotografía en el periódico para explicar la imagen:", a: ["Título", "Pie de foto", "Moraleja"], correct: 1, points: 100, time: 10, image: null }
+            ]
+          }
+        ];
       }
       renderEditor();
     } catch (err) {
@@ -399,6 +426,21 @@
       `;
 
       level.questions.forEach((q, qIndex) => {
+        
+        // Determinar qué mostrar en la sección de imagen
+        let imageSection = '';
+        if (q.image) {
+          imageSection = `
+            <img src="${q.image}" alt="Miniatura">
+            <button class="btn btn-danger btn-small" onclick="removeImage(${lIndex}, ${qIndex})">Quitar</button>
+          `;
+        } else {
+          imageSection = `
+            <input type="file" accept="image/*" onchange="uploadAndCompressImage(event, ${lIndex}, ${qIndex})">
+            <span style="font-size:12px; color:#999;">Opcional (se comprimirá automático)</span>
+          `;
+        }
+
         html += `
         <div class="question-card">
           <div class="level-card-header">
@@ -409,11 +451,24 @@
           <div class="flex-row">
             <label>Texto:</label>
             <input type="text" value="${escapeHTML(q.q)}" oninput="updateQuestionData(${lIndex}, ${qIndex}, 'q', this.value)">
-            <label>Puntaje:</label>
-            <input type="number" value="${q.points || 100}" oninput="updateQuestionData(${lIndex}, ${qIndex}, 'points', parseInt(this.value))">
           </div>
           
-          <label style="font-weight:bold; font-size: 13px; color: #6b6280;">Opciones de Respuesta (Selecciona la correcta):</label>
+          <div class="flex-row">
+            <label>Puntaje:</label>
+            <input type="number" value="${q.points || 100}" oninput="updateQuestionData(${lIndex}, ${qIndex}, 'points', parseInt(this.value))">
+            
+            <label>Tiempo (segs):</label>
+            <input type="number" value="${q.time || 10}" oninput="updateQuestionData(${lIndex}, ${qIndex}, 'time', parseInt(this.value))">
+          </div>
+
+          <div class="flex-row">
+            <label>Imagen:</label>
+            <div class="image-preview-box">
+              ${imageSection}
+            </div>
+          </div>
+          
+          <label style="font-weight:bold; font-size: 13px; color: #6b6280; margin-top: 10px; display:block;">Opciones de Respuesta (Selecciona la correcta):</label>
           <ul class="options-list">
         `;
         
@@ -442,20 +497,15 @@
     container.innerHTML = html;
   }
 
-  // --- Funciones para manipular el array temporal (Local) ---
-  
   function updateLevelData(lIndex, field, value) { gameLevelsData[lIndex][field] = value; }
-  
   function updateQuestionData(lIndex, qIndex, field, value) { gameLevelsData[lIndex].questions[qIndex][field] = value; }
-  
   function updateOptionText(lIndex, qIndex, oIndex, value) { gameLevelsData[lIndex].questions[qIndex].a[oIndex] = value; }
-  
   function setCorrectAnswer(lIndex, qIndex, oIndex) { gameLevelsData[lIndex].questions[qIndex].correct = oIndex; }
 
   function addLevel() {
     gameLevelsData.push({
       name: "Nuevo Nivel", desc: "Descripción...", icon: "newspaper",
-      questions: [{ q: "¿Nueva Pregunta?", a: ["Opción 1", "Opción 2"], correct: 0, points: 100 }]
+      questions: [{ q: "¿Nueva Pregunta?", a: ["Opción 1", "Opción 2"], correct: 0, points: 100, time: 10, image: null }]
     });
     renderEditor();
   }
@@ -468,7 +518,7 @@
   }
 
   function addQuestion(lIndex) {
-    gameLevelsData[lIndex].questions.push({ q: "¿Nueva Pregunta?", a: ["Opción 1", "Opción 2"], correct: 0, points: 100 });
+    gameLevelsData[lIndex].questions.push({ q: "¿Nueva Pregunta?", a: ["Opción 1", "Opción 2"], correct: 0, points: 100, time: 10, image: null });
     renderEditor();
   }
 
@@ -488,13 +538,52 @@
     const qData = gameLevelsData[lIndex].questions[qIndex];
     if(qData.a.length <= 2) return alert("Una pregunta debe tener al menos 2 opciones.");
     qData.a.splice(oIndex, 1);
-    // Si borramos la correcta, reseteamos a la opcion 0 por seguridad
     if(qData.correct === oIndex) qData.correct = 0; 
     else if(qData.correct > oIndex) qData.correct -= 1;
     renderEditor();
   }
 
-  // --- Guardar Estructura a Firebase ---
+  // --- COMPRESOR DE IMÁGENES HTML5 CANVAS ---
+  function uploadAndCompressImage(event, lIndex, qIndex) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        // Redimensionar para no reventar la base de datos (max 600px de ancho)
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600; 
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir a Data URL (JPEG comprimido al 80%)
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        
+        gameLevelsData[lIndex].questions[qIndex].image = compressedDataUrl;
+        renderEditor(); // Refrescar vista
+      }
+      img.src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage(lIndex, qIndex) {
+    gameLevelsData[lIndex].questions[qIndex].image = null;
+    renderEditor();
+  }
+
   async function saveGameDataToFirebase() {
     try {
       await db.collection("config").doc("gameData").set({ levels: gameLevelsData });
@@ -504,7 +593,6 @@
       alert("Hubo un error al guardar. Revisa la consola.");
     }
   }
-
 </script>
 </body>
 </html>
