@@ -80,12 +80,15 @@
   .pill svg{ width:16px; height:16px; }
   #score{ transition: transform 0.25s ease; display:inline-block; }
   #score.bump{ transform: scale(1.35); }
-  #mute-btn{
+  
+  .top-btn-group { display: flex; gap: 8px; }
+  .icon-btn {
     background:rgba(255,255,255,0.85); border:none; border-radius:50%;
     width:32px; height:32px; display:flex; align-items:center; justify-content:center;
-    cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.08); transition: transform 0.1s ease;
   }
-  #mute-btn svg{ width:16px; height:16px; }
+  .icon-btn:active { transform: scale(0.9); }
+  .icon-btn svg { width:16px; height:16px; }
 
   #level-title{
     text-align:center; font-size:19px; font-weight:700; color:var(--primary-dark);
@@ -120,7 +123,7 @@
   .paw{ width:16px; height:16px; opacity:0.35; transition: all 0.3s ease; }
   .paw.filled{ opacity:1; transform:scale(1.15); }
 
-  /* ---------- Pregunta y NUEVA IMAGEN ---------- */
+  /* ---------- Pregunta y IMAGEN ---------- */
   #question-container{
     flex-grow:1; display:flex; flex-direction:column; justify-content:center;
     background:var(--card); border-radius:22px; padding:20px 16px;
@@ -130,15 +133,9 @@
   #level-icon-wrap svg{ width:46px; height:46px; }
   
   #question-image {
-    display: none; /* Oculto por defecto */
-    max-width: 100%;
-    max-height: 130px;
-    object-fit: contain;
-    border-radius: 12px;
-    margin: 0 auto 15px auto;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: none; max-width: 100%; max-height: 130px; object-fit: contain;
+    border-radius: 12px; margin: 0 auto 15px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   }
-
   #question{ font-size:19px; font-weight:700; text-align:center; line-height:1.4; margin-bottom:20px; color:var(--ink); }
 
   .btn{
@@ -158,7 +155,7 @@
     position:absolute; top:44%; left:50%; transform:translate(-50%,-50%);
     font-size:30px; font-weight:800; opacity:0; pointer-events:none;
     text-shadow:0 4px 14px rgba(0,0,0,0.25); text-align:center; width:100%; z-index:15;
-    display:flex; flex-direction:column; align-items:center; gap:4px;
+    display:flex; flex-direction:column; align-items:center; gap:4px; line-height: 1.1;
   }
   #popup svg{ width:52px; height:52px; }
   .show-popup{ animation: float-up 1.15s ease-out forwards; }
@@ -237,9 +234,16 @@
       <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.1 5.7 20.8l1.7-6.9L2 9.2l7.1-.6z" fill="var(--gold)"/></svg>
       <span id="score">0</span>
     </div>
-    <button id="mute-btn" onclick="toggleMute()" aria-label="Silenciar sonido">
-      <svg id="mute-icon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="var(--ink)"/><path id="wave1" d="M16.5 8.5a5 5 0 010 7" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path id="wave2" d="M19 6a8.5 8.5 0 010 12" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
-    </button>
+    <div class="top-btn-group">
+      <!-- Botón de Silencio -->
+      <button id="mute-btn" class="icon-btn" onclick="toggleMute()" aria-label="Silenciar sonido">
+        <svg id="mute-icon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="var(--ink)"/><path id="wave1" d="M16.5 8.5a5 5 0 010 7" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/><path id="wave2" d="M19 6a8.5 8.5 0 010 12" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <!-- NUEVO: Botón de Salir -->
+      <button id="exit-btn" class="icon-btn" onclick="exitGame()" aria-label="Salir al inicio">
+        <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" fill="var(--error)"/></svg>
+      </button>
+    </div>
   </div>
 
   <div id="level-title">Cargando...</div>
@@ -294,7 +298,6 @@
   <div id="question-container">
     <div id="level-icon-wrap"></div>
     
-    <!-- NUEVO CONTENEDOR DE IMAGEN -->
     <img id="question-image" src="" alt="Imagen de la pregunta">
     
     <div id="question">Cargando pregunta...</div>
@@ -335,7 +338,7 @@
   <button id="save-score-btn" class="start-btn save-btn" onclick="saveScore()">Guardar Puntuación</button>
   
   <div id="leaderboard-container">
-    <h3>Top Mejores Jugadore</h3>
+    <h3>Top Mejores Jugadores</h3>
     <table class="leaderboard-table">
       <thead>
         <tr><th>Rango</th><th>Nombre</th><th>Puntos</th></tr>
@@ -355,12 +358,12 @@
 <script>
   // --- Configuración de Firebase ---
   const firebaseConfig = {
-  apiKey: "AIzaSyDJaoXKhI8QJ0i36hicpGGC21gDRAvMDRg",
-  authDomain: "quizzrepor.firebaseapp.com",
-  projectId: "quizzrepor",
-  storageBucket: "quizzrepor.firebasestorage.app",
-  messagingSenderId: "648203197422",
-  appId: "1:648203197422:web:f9d022df1f26574103ccff"
+    apiKey: "AIzaSyDJaoXKhI8QJ0i36hicpGGC21gDRAvMDRg",
+    authDomain: "quizzrepor.firebaseapp.com",
+    projectId: "quizzrepor",
+    storageBucket: "quizzrepor.firebasestorage.app",
+    messagingSenderId: "648203197422",
+    appId: "1:648203197422:web:f9d022df1f26574103ccff"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
@@ -394,12 +397,15 @@
   };
 
   let currentLevel = 0, currentQuestion = 0, score = 0, timeLeft = 10, timerInterval = null;
-  let currentTotalTime = 10; // Para calcular el porcentaje de la carrera
+  let currentTotalTime = 10; 
   let muted = false, audioCtx = null, questionLocked = false;
 
   /* ---------------- DESCARGAR PREGUNTAS AL INICIAR ---------------- */
   document.addEventListener('DOMContentLoaded', async () => {
     const startBtn = document.getElementById('main-start-btn');
+    // NUEVO: Mostrar tabla de clasificación desde el principio
+    document.getElementById('leaderboard-container').style.display = 'block';
+    loadLeaderboard();
     
     try {
       const doc = await db.collection("config").doc("gameData").get();
@@ -444,6 +450,25 @@
     document.getElementById('wave2').style.opacity = muted ? 0.15 : 1;
   }
 
+  /* ---------------- SALIR AL INICIO ---------------- */
+  function exitGame() {
+    if(!confirm("¿Estás seguro de que quieres salir? Perderás tu progreso actual.")) return;
+    
+    clearInterval(timerInterval);
+    currentLevel = 0;
+    score = 0;
+    document.getElementById('score').innerText = score;
+    
+    // Ocultar inputs si se estaban mostrando en la pantalla final
+    document.getElementById('player-name-input').style.display = 'none';
+    document.getElementById('save-score-btn').style.display = 'none';
+    
+    // Volver a mostrar el overlay principal y la tabla
+    document.getElementById('leaderboard-container').style.display = 'block';
+    showOverlay("Las Preguntas Mágicas", "¿Listo para demostrar tus habilidades junto al zorro Foxym?", "¡Comenzar!");
+    loadLeaderboard();
+  }
+
   /* ---------------- Overlay ---------------- */
   function showOverlay(title, desc, btnText){
     document.getElementById('overlay-title').innerText = title;
@@ -458,6 +483,8 @@
     
     document.getElementById('player-name-input').style.display = 'none';
     document.getElementById('save-score-btn').style.display = 'none';
+    
+    // Ocultar tabla de posiciones durante el juego
     document.getElementById('leaderboard-container').style.display = 'none';
     document.getElementById('main-start-btn').style.display = 'inline-block';
     
@@ -483,7 +510,6 @@
     const levelData = gameData[currentLevel];
     const qData = levelData.questions[currentQuestion];
 
-    // Asignar tiempo dinámico
     currentTotalTime = qData.time || 10;
 
     document.getElementById('ui-level').innerText = `${currentLevel + 1}/${gameData.length}`;
@@ -495,7 +521,6 @@
 
     renderPaws(levelData.questions.length, currentQuestion);
     
-    // Cargar la imagen (si existe)
     const imgEl = document.getElementById('question-image');
     if (qData.image) {
       imgEl.src = qData.image;
@@ -530,7 +555,6 @@
   }
 
   function updateRace(t){
-    // Calculamos el progreso en base al tiempo total de esa pregunta
     const progress = (currentTotalTime - t) / currentTotalTime;
     document.getElementById('racer-fox').style.left = (4 + progress * 66) + '%';
     if(t <= 3) document.getElementById('time-label').style.color = '#FFD9D9';
@@ -548,7 +572,7 @@
     }, 1000);
   }
 
-  /* ---------------- Respuestas ---------------- */
+  /* ---------------- Respuestas (NUEVA REGLA DE 3 PARA PUNTAJES) ---------------- */
   function lockButtons(){ document.querySelectorAll('.btn').forEach(btn => btn.style.pointerEvents = 'none'); }
 
   function checkAnswer(selectedIndex, buttonElement){
@@ -561,10 +585,17 @@
 
     if(selectedIndex === correctIndex){
       buttonElement.classList.add('correct');
-      // Sumar los puntos dinámicos
-      score += (qData.points || 100);
+      
+      // NUEVO: Regla de 3 para calcular los puntos proporcionales al tiempo
+      const maxPts = qData.points || 100;
+      const percentage = timeLeft / currentTotalTime;
+      // Math.max asegura que aunque respondan en el último milisegundo, ganen al menos 1 punto
+      const pointsEarned = Math.max(Math.ceil(maxPts * percentage), 1);
+      
+      score += pointsEarned;
+      
       bumpScore(); spawnConfetti();
-      showFloatingFeedback(true, "¡ACERTASTE!");
+      showFloatingFeedback(true, `¡ACERTASTE!<br><span style="font-size:22px; color:#c6ffd2;">+${pointsEarned} pts</span>`);
       playCorrectSound();
     } else {
       buttonElement.classList.add('wrong');
@@ -652,6 +683,7 @@
     document.getElementById('main-start-btn').style.display = 'none';
     document.getElementById('player-name-input').style.display = 'block';
     document.getElementById('save-score-btn').style.display = 'inline-block';
+    document.getElementById('leaderboard-container').style.display = 'block';
     loadLeaderboard();
   }
 
@@ -677,7 +709,7 @@
   function loadLeaderboard() {
     const container = document.getElementById('leaderboard-container');
     const tbody = document.getElementById('leaderboard-body');
-    container.style.display = 'block';
+    
     tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando datos...</td></tr>';
 
     db.collection("leaderboard").orderBy("score", "desc").limit(5).get().then((querySnapshot) => {
